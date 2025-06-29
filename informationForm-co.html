@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>發佈提案 - 芝山圓夢媒合站</title>
+  <script src="header-component.js" defer></script>
+  <script src="footer-component.js" defer></script>
+  <link rel="stylesheet" href="css/informationForm-co.css" />
+</head>
+
+<body>
+  <header-component></header-component>
+
+  <main class="form-wrapper">
+    <form class="proposal-form" id="proposalForm">
+      <h2>發佈提案</h2>
+
+      <label>公司/組織名稱</label>
+      <input type="text" name="company" placeholder="請輸入公司/組織名稱" required />
+
+      <label>提案摘要</label>
+      <input type="text" name="summary" placeholder="請簡要描述" required />
+
+      <label>專案敘述</label>
+      <textarea name="description" rows="5" placeholder="詳細描述您的提案內容、目標" required></textarea>
+
+      <label>專案類別</label>
+      <select name="category" required>
+        <option value="">請選擇類別</option>
+        <option value="數位醫療">數位醫療</option>
+        <option value="AI應用">AI應用</option>
+        <option value="永續環境">永續環境</option>
+        <option value="其他">其他</option>
+      </select>
+
+      <label>預算範圍</label>
+      <input type="number" name="budget" placeholder="請輸入預期的預算金額 (單位：25000–30000)" required />
+
+      <label>截止日期</label>
+      <input type="date" name="deadline" required />
+
+      <label>上傳附件文件</label>
+      <div class="upload-area" id="uploadArea">
+        <img src="img/upload.png" alt="upload icon" />
+        <p>點擊上傳文件或拖曳文件到此處</p>
+        <p class="upload-note">支援 PDF, DOC, DOCX, JPG, PNG (最大 10MB)</p>
+        <input type="file" id="fileInput" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" style="display: none;" />
+      </div>
+      
+      <div class="file-preview" id="filePreview" style="display: none;">
+        <div class="file-info">
+          <span class="file-name" id="fileName"></span>
+          <span class="file-size" id="fileSize"></span>
+          <button type="button" class="remove-file" id="removeFile">✕</button>
+        </div>
+        <div class="upload-progress" id="uploadProgress" style="display: none;">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+          <span class="progress-text" id="progressText">0%</span>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-button" id="submitBtn">發佈 →</button>
+    </form>
+  </main>
+
+  <footer-component></footer-component>
+
+  <script type="module">
+    // Import Firebase SDK
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+    // 暫時註解掉 Storage 相關導入
+    // import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
+
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+      authDomain: "ntuedream.firebaseapp.com",
+      projectId: "ntuedream",
+      storageBucket: "ntuedream.firebasestorage.app",
+      messagingSenderId: "1052981554365",
+      appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+      measurementId: "G-SF8QTGQC1V"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    // 暫時註解掉 Storage 初始化
+    // const storage = getStorage(app);
+
+    // 暫時註解掉檔案相關變數和函數
+    /*
+    // Global variables
+    let selectedFile = null;
+
+    // DOM elements
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('fileInput');
+    const filePreview = document.getElementById('filePreview');
+    const fileName = document.getElementById('fileName');
+    const fileSize = document.getElementById('fileSize');
+    const removeFileBtn = document.getElementById('removeFile');
+    const uploadProgress = document.getElementById('uploadProgress');
+    const progressFill = document.getElementById('progressFill');
+    const progressText = document.getElementById('progressText');
+
+    // Utility functions
+    const formatFileSize = (bytes) => {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    };
+
+    const validateFile = (file) => {
+      const allowedTypes = [
+        'application/pdf',
+        'application/msword',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'image/jpeg',
+        'image/png',
+        'image/jpg'
+      ];
+      const maxSize = 10 * 1024 * 1024; // 10MB
+
+      if (!allowedTypes.includes(file.type)) {
+        alert('不支援的檔案格式！請上傳 PDF, DOC, DOCX, JPG, PNG 格式的檔案。');
+        return false;
+      }
+
+      if (file.size > maxSize) {
+        alert('檔案太大！請上傳小於 10MB 的檔案。');
+        return false;
+      }
+
+      return true;
+    };
+
+    const showFilePreview = (file) => {
+      selectedFile = file;
+      fileName.textContent = file.name;
+      fileSize.textContent = formatFileSize(file.size);
+      filePreview.style.display = 'block';
+      uploadArea.style.display = 'none';
+    };
+
+    const removeFile = () => {
+      selectedFile = null;
+      filePreview.style.display = 'none';
+      uploadArea.style.display = 'flex';
+      uploadProgress.style.display = 'none';
+      fileInput.value = '';
+      progressFill.style.width = '0%';
+      progressText.textContent = '0%';
+    };
+
+    const uploadFileToStorage = async (file) => {
+      const timestamp = Date.now();
+      const filename = `proposals/${timestamp}_${file.name}`;
+      const storageRef = ref(storage, filename);
+
+      try {
+        uploadProgress.style.display = 'block';
+        progressFill.style.width = '50%';
+        progressText.textContent = '50%';
+        
+        const snapshot = await uploadBytes(storageRef, file);
+        
+        progressFill.style.width = '90%';
+        progressText.textContent = '90%';
+        
+        const downloadURL = await getDownloadURL(snapshot.ref);
+        
+        progressFill.style.width = '100%';
+        progressText.textContent = '100%';
+        
+        return downloadURL;
+      } catch (error) {
+        console.error('檔案上傳失敗:', error);
+        throw error;
+      }
+    };
+
+    // Event listeners for file upload
+    fileInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file && validateFile(file)) {
+        showFilePreview(file);
+      }
+    });
+
+    uploadArea.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    uploadArea.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = '#ffb84d';
+      uploadArea.style.backgroundColor = '#fffaf0';
+    });
+
+    uploadArea.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = '#ccc';
+      uploadArea.style.backgroundColor = '#fff';
+    });
+
+    uploadArea.addEventListener('drop', (e) => {
+      e.preventDefault();
+      uploadArea.style.borderColor = '#ccc';
+      uploadArea.style.backgroundColor = '#fff';
+      
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        const file = files[0];
+        if (validateFile(file)) {
+          showFilePreview(file);
+        }
+      }
+    });
+
+    removeFileBtn.addEventListener('click', removeFile);
+    */
+
+    // DOM elements (只保留必要的)
+    const form = document.getElementById('proposalForm');
+    const submitBtn = document.getElementById('submitBtn');
+
+    // Form submission (移除檔案上傳相關邏輯)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const formData = new FormData(form);
+      
+      try {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '提交中...';
+
+        const data = {
+          title: formData.get('company'),
+          summary: formData.get('summary'),
+          description: formData.get('description'),
+          category: formData.get('category'),
+          budget: parseInt(formData.get('budget')),
+          deadline: formData.get('deadline'),
+          type: 'company',
+          createdAt: serverTimestamp()
+        };
+
+        // 暫時註解掉檔案上傳邏輯
+        /*
+        if (selectedFile) {
+          submitBtn.textContent = '上傳檔案中...';
+          const fileURL = await uploadFileToStorage(selectedFile);
+          data.attachmentURL = fileURL;
+          data.attachmentName = selectedFile.name;
+        }
+        */
+
+        // 提交到 Firestore
+        await addDoc(collection(db, 'proposals'), data);
+
+        alert('提案已成功提交！');
+        form.reset();
+        // removeFile(); // 暫時註解掉
+
+      } catch (error) {
+        console.error('提交失敗:', error);
+        alert('提交失敗，請稍後再試：' + error.message);
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = '發佈 →';
+      }
+    });
+  </script>
+</body>
+</html>

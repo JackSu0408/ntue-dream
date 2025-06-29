@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>發佈提案 - 芝山圓夢媒合站</title>
+  <script src="header-component.js" defer></script>
+  <script src="footer-component.js" defer></script>
+  <link rel="stylesheet" href="css/informationForm-stu.css" />
+</head>
+<body>
+  <header-component></header-component>
+
+  <main class="form-wrapper">
+    <form class="proposal-form">
+      <h2>發佈提案</h2>
+
+      <label>姓名</label>
+      <input type="text" placeholder="請輸入您的姓名" required />
+
+      <label>科系</label>
+      <input type="text" placeholder="請輸入您的科系" required />
+      
+      <label>提案摘要</label>
+      <input type="text" placeholder="請簡要描述" required />
+
+      <label>專案敘述</label>
+      <textarea rows="5" placeholder="詳細描述您的提案內容、目標" required></textarea>
+
+      <label>專案類別</label>
+      <select required>
+        <option value="">請選擇類別</option>
+        <option>數位醫療</option>
+        <option>AI應用</option>
+        <option>永續環境</option>
+        <option>其他</option>
+      </select>
+
+      <label>預算範圍</label>
+      <input type="number" placeholder="請輸入預期的預算金額 (單位：25000–30000)" required />
+
+      <label>截止日期</label>
+      <input type="date" required />
+
+      <label>上傳附件文件</label>
+      <div class="upload-area">
+        <img src="img/upload.png" alt="upload icon" />
+        <p>上傳文件</p>
+        <input type="file" />
+      </div>
+
+      <button type="submit" class="submit-button">發佈 →</button>
+    </form>
+  </main>
+
+  <footer-component></footer-component>
+
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+      authDomain: "ntuedream.firebaseapp.com",
+      projectId: "ntuedream",
+      storageBucket: "ntuedream.firebasestorage.app",
+      messagingSenderId: "1052981554365",
+      appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+      measurementId: "G-SF8QTGQC1V"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const db = getFirestore(app);
+
+    // 將 db 設為全域變數
+    window.db = db;
+    window.collection = collection;
+    window.addDoc = addDoc;
+  </script>
+
+  <script>
+    document.querySelector(".proposal-form").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const data = {
+        name: form.querySelector('input[type="text"]').value,
+        department: form.querySelectorAll('input[type="text"]')[1].value,
+        summary: form.querySelectorAll('input[type="text"]')[2].value,
+        description: form.querySelector("textarea").value,
+        category: form.querySelector("select").value,
+        budget: form.querySelector('input[type="number"]').value,
+        deadline: form.querySelector('input[type="date"]').value,
+        createdAt: new Date(),
+        type: 'student' // 標記這是學生提案
+      };
+
+      try {
+        await window.addDoc(window.collection(window.db, "proposals"), data);
+        alert("提案已成功提交！");
+        form.reset();
+      } catch (err) {
+        console.error("送出失敗", err);
+        alert("提交失敗，請稍後再試");
+      }
+    });
+  </script>
+</body>
+</html>

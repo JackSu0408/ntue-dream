@@ -1,0 +1,61 @@
+body {
+	margin: 0;
+	padding: 0;
+	background-color: #f5f5dc;
+	font-family: 'Noto Sans TC', sans-serif;
+	display: flex;
+	flex-direction: column;
+	min-height: 100vh;
+	color: #333;
+}
+
+main {
+	flex-grow: 1;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 6vw 8vw;
+}
+
+.hero-section {
+	width: 100%;
+	max-width: 85%;
+}
+
+.hero-title {
+	font-size: 2.8vw;
+	font-weight: 700;
+	line-height: 1.4;
+	margin-bottom: 1vw;
+}
+
+.hero-title span {
+	color: #ffb84d; /* 改為較淡的橘色 */
+}
+
+.hero-description {
+	font-size: 1.2vw;
+	/* 原約18px in 1280px */
+	line-height: 1.9;
+	color: #666;
+	margin-bottom: 2vw;
+	max-width: 80%;
+}
+
+.hero-button {
+	display: inline-block;
+	padding: 0.9vw 1.8vw;
+	font-size: 1vw;
+	background-color: #ffb84d; /* 改為較淡的橘色 */
+	color: white;
+	border: none;
+	border-radius: 1.5vw;
+	text-decoration: none;
+	font-weight: bold;
+	cursor: pointer;
+	transition: background-color 0.3s ease;
+}
+
+.hero-button:hover {
+	background-color: #ffb733;
+}

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>提案總覽 - 芝山圓夢媒合站</title>
+    <script src="header-component.js" defer></script>
+    <script src="footer-component.js" defer></script>
+    <link rel="stylesheet" href="css/overview.css" />
+</head>
+<body>
+    <header-component></header-component>
+
+    <main class="overview-section">
+        <div class="proposals-container" id="proposalsContainer">
+            <!-- 提案卡片將由 JavaScript 動態生成 -->
+        </div>
+        
+        <div class="load-more-container">
+            <button class="load-more-btn" id="loadMoreBtn">
+                查看更多 ↓
+            </button>
+        </div>
+    </main>
+
+    <footer-component></footer-component>
+
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, collection, getDocs, query, orderBy, limit, startAfter } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+            authDomain: "ntuedream.firebaseapp.com",
+            projectId: "ntuedream",
+            storageBucket: "ntuedream.firebasestorage.app",
+            messagingSenderId: "1052981554365",
+            appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+            measurementId: "G-SF8QTGQC1V"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let lastDoc = null;
+        const proposalsPerPage = 6;
+
+        // 格式化日期
+        function formatDate(date) {
+            if (!date) return '';
+            const d = date.toDate ? date.toDate() : new Date(date);
+            return d.toLocaleDateString('zh-TW');
+        }
+
+        // 建立提案卡片
+        function createProposalCard(proposal, index) {
+            const isCompany = proposal.type === 'company';
+            const cardClass = isCompany ? 'proposal-card company' : 'proposal-card student';
+            const iconSrc = isCompany ? 'img/office.png' : 'img/student.png';
+            
+            // 從 Firebase 資料中取得標題
+            let displayTitle = '';
+            let displayAuthor = '';
+            
+            if (isCompany) {
+                // 企業提案：使用 title 作為主標題，summary 作為副標題
+                displayTitle = proposal.title || '企業提案';
+                displayAuthor = proposal.summary || '企業名稱';
+            } else {
+                // 學生提案：使用 summary 作為主標題，name + department 作為副標題
+                displayTitle = proposal.summary || '學生提案';
+                if (proposal.name && proposal.department) {
+                    displayAuthor = `${proposal.name} - ${proposal.department}`;
+                } else {
+                    displayAuthor = proposal.name || proposal.department || '學生';
+                }
+            }
+
+            // 處理標籤 - 從 category 和其他可能的標籤來源
+            const tags = [];
+            
+            // 添加分類標籤
+            if (proposal.category) {
+                tags.push(proposal.category);
+            }
+            
+            // 可以根據需要添加更多標籤邏輯
+            // 例如：根據關鍵字、技能需求等自動生成標籤
+            if (proposal.skills && Array.isArray(proposal.skills)) {
+                tags.push(...proposal.skills);
+            }
+            
+            // 如果沒有標籤，可以根據描述內容智慧生成
+            if (tags.length === 0) {
+                if (isCompany) {
+                    // 企業提案的預設標籤可以根據描述關鍵字生成
+                    const description = (proposal.description || '').toLowerCase();
+                    if (description.includes('行銷') || description.includes('marketing')) tags.push('行銷企劃');
+                    if (description.includes('社群') || description.includes('social')) tags.push('社群經營');
+                    if (description.includes('活動') || description.includes('event')) tags.push('活動策劃');
+                    if (description.includes('品牌') || description.includes('brand')) tags.push('品牌推廣');
+                } else {
+                    // 學生提案的預設標籤
+                    const description = (proposal.description || '').toLowerCase();
+                    if (description.includes('app') || description.includes('應用程式')) tags.push('APP開發');
+                    if (description.includes('ui') || description.includes('ux') || description.includes('設計')) tags.push('UI/UX設計');
+                    if (description.includes('web') || description.includes('網站')) tags.push('網頁開發');
+                    if (description.includes('ai') || description.includes('人工智慧')) tags.push('AI開發');
+                    if (description.includes('資料') || description.includes('data')) tags.push('資料分析');
+                }
+            }
+
+            // 格式化預算
+            let budget = 'NT$ 5000'; // 預設值
+            if (proposal.budget) {
+                const budgetNum = parseInt(proposal.budget);
+                if (!isNaN(budgetNum)) {
+                    if (budgetNum >= 1000) {
+                        budget = `NT$ ${(budgetNum / 1000).toFixed(0)}K`;
+                    } else {
+                        budget = `NT$ ${budgetNum.toLocaleString()}`;
+                    }
+                }
+            }
+            
+            // 計算時間差
+            const timeAgo = calculateTimeAgo(proposal.createdAt);
+
+            // 處理描述文字
+            const description = proposal.description || '暫無詳細描述';
+
+            return `
+                <div class="${cardClass}">
+                    <div class="card-header">
+                        <div class="card-icon-title">
+                            <div class="card-icon">
+                                <img src="${iconSrc}" alt="${isCompany ? '企業' : '學生'}" onerror="this.src='img/default-icon.png'">
+                            </div>
+                            <div class="card-meta">
+                                <h3 class="card-title">${displayTitle}</h3>
+                                <p class="card-author">${displayAuthor}</p>
+                            </div>
+                        </div>
+                        <p class="card-time">${timeAgo}</p>
+                    </div>
+                    
+                    <div class="card-content">
+                        <p class="card-description">
+                            ${description}
+                        </p>
+                        
+                        <div class="card-tags">
+                            ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+                        </div>
+                    </div>
+                    
+                    <div class="card-price">
+                        <p class="price-text">${budget}</p>
+                        <button class="contact-btn" onclick="viewProposalDetails('${proposal.id}')">查看詳情</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 計算時間差的函數
+        function calculateTimeAgo(createdAt) {
+            if (!createdAt) return '1週前';
+            
+            const now = new Date();
+            const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+            const diffInMs = now - created;
+            const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            const diffInDays = Math.floor(diffInHours / 24);
+            const diffInWeeks = Math.floor(diffInDays / 7);
+            
+            if (diffInMinutes < 60) {
+                return diffInMinutes <= 1 ? '剛剛' : `${diffInMinutes}分鐘前`;
+            } else if (diffInHours < 24) {
+                return `${diffInHours}小時前`;
+            } else if (diffInDays === 1) {
+                return '1天前';
+            } else if (diffInDays < 7) {
+                return `${diffInDays}天前`;
+            } else if (diffInWeeks === 1) {
+                return '1週前';
+            } else {
+                return `${diffInWeeks}週前`;
+            }
+        }
+
+        // 查看提案詳情的函數
+        window.viewProposalDetails = function(proposalId) {
+            // 這裡可以導向到詳細頁面或開啟彈窗
+            console.log('查看提案詳情:', proposalId);
+            // 例如：window.location.href = `proposal-detail.html?id=${proposalId}`;
+            alert(`查看提案詳情: ${proposalId}`);
+        }
+
+        // 載入提案資料
+        async function loadProposals(isLoadMore = false) {
+            try {
+                const proposalsContainer = document.getElementById('proposalsContainer');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                
+                // 顯示載入中狀態
+                if (!isLoadMore) {
+                    proposalsContainer.innerHTML = '<p class="loading-message">載入中...</p>';
+                }
+                
+                let q = query(
+                    collection(db, "proposals"),
+                    orderBy("createdAt", "desc"),
+                    limit(proposalsPerPage)
+                );
+
+                if (isLoadMore && lastDoc) {
+                    q = query(
+                        collection(db, "proposals"),
+                        orderBy("createdAt", "desc"),
+                        startAfter(lastDoc),
+                        limit(proposalsPerPage)
+                    );
+                }
+
+                const querySnapshot = await getDocs(q);
+                
+                if (querySnapshot.empty) {
+                    if (!isLoadMore) {
+                        proposalsContainer.innerHTML = '<p class="no-proposals">目前沒有提案</p>';
+                    }
+                    loadMoreBtn.style.display = 'none';
+                    return;
+                }
+
+                const proposals = [];
+                querySnapshot.forEach((doc) => {
+                    proposals.push({ id: doc.id, ...doc.data() });
+                });
+
+                lastDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+
+                if (!isLoadMore) {
+                    proposalsContainer.innerHTML = '';
+                }
+
+                proposals.forEach((proposal, index) => {
+                    proposalsContainer.innerHTML += createProposalCard(proposal, index);
+                });
+
+                // 如果返回的文檔少於每頁數量，隱藏載入更多按鈕
+                if (querySnapshot.docs.length < proposalsPerPage) {
+                    loadMoreBtn.style.display = 'none';
+                } else {
+                    loadMoreBtn.style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error("載入提案時發生錯誤:", error);
+                document.getElementById('proposalsContainer').innerHTML = 
+                    '<p class="error-message">載入提案時發生錯誤，請稍後再試</p>';
+            }
+        }
+
+        // 載入更多按鈕事件
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            loadProposals(true);
+        });
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProposals();
+        });
+    </script>
+</body>
+</html>
