@@ -1,0 +1,487 @@
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Noto Sans TC", sans-serif;
+  background-color: #f5f5dc; /* 與其他頁面一致的米白色背景 */
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+main.register-wrapper {
+  flex-grow: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 3vw 2vw;
+}
+
+.register-container {
+  background-color: #dcdcc0; /* 與 footer 一致的淺灰色 */
+  border-radius: 2vw;
+  width: 100%;
+  max-width: 450px; /* 減小最大寬度，因為內容減少了 */
+  padding: 2.5vw 3.5vw;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.register-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2vw;
+  position: relative;
+}
+
+.back-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5vw;
+  margin-right: 1vw;
+  border-radius: 50%;
+  transition: background-color 0.3s ease;
+}
+
+.back-btn img {
+  width: 2vw;
+  height: 2vw;
+  transform: rotate(180deg);
+}
+
+.register-header h2 {
+  font-size: 2vw;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+  flex-grow: 1;
+  text-align: center;
+  margin-right: 3vw;
+}
+
+.register-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4vw;
+}
+
+.form-group label {
+  font-size: 1vw;
+  font-weight: bold;
+  color: #333;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group input[type="tel"] {
+  width: 100%;
+  font-size: 0.9vw;
+  padding: 1vw;
+  border: 1px solid #ccc;
+  border-radius: 0.8vw;
+  box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ffb84d;
+  box-shadow: 0 0 0 2px rgba(255, 184, 77, 0.2);
+}
+
+.password-input {
+  position: relative;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1vw;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.3vw;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.toggle-password:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.toggle-password img {
+  width: 1.1vw;
+  height: 1.1vw;
+  min-width: 15px;
+  min-height: 15px;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.toggle-password:hover img {
+  opacity: 0.8;
+}
+
+/* 移除專用欄位相關樣式 */
+/*
+.student-fields,
+.company-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vw;
+  margin-top: 0.5vw;
+  padding: 1.5vw;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 1vw;
+  border-left: 4px solid #ffb84d;
+}
+*/
+
+.form-options {
+  display: flex;
+  align-items: flex-start;
+  margin: 0.3vw 0;
+}
+
+.terms-agree {
+  display: flex;
+  align-items: flex-start;
+  cursor: pointer;
+  font-size: 0.85vw;
+  color: #666;
+  line-height: 1.4;
+}
+
+.terms-agree input[type="checkbox"] {
+  display: none;
+}
+
+.checkmark {
+  width: 1.1vw;
+  height: 1.1vw;
+  min-width: 15px;
+  min-height: 15px;
+  border: 2px solid #ccc;
+  border-radius: 0.3vw;
+  margin-right: 0.5vw;
+  margin-top: 0.1vw;
+  position: relative;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+}
+
+.terms-agree input[type="checkbox"]:checked + .checkmark {
+  background-color: #ffb84d;
+  border-color: #ffb84d;
+}
+
+.terms-agree input[type="checkbox"]:checked + .checkmark::after {
+  content: '';
+  position: absolute;
+  left: 0.25vw;
+  top: 0.05vw;
+  width: 0.25vw;
+  height: 0.5vw;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.terms-link,
+.privacy-link {
+  color: #ffb84d;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.terms-link:hover,
+.privacy-link:hover {
+  color: #ff9f26;
+  text-decoration: underline;
+}
+
+.register-btn {
+  width: 100%;
+  font-size: 1.1vw;
+  font-weight: bold;
+  padding: 1.2vw;
+  border: none;
+  border-radius: 2vw;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1vw;
+  background-color: #ffb84d;
+  color: white;
+}
+
+.register-btn:hover {
+  background-color: #ff9f26;
+  transform: translateY(-2px);
+}
+
+.register-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.register-btn:disabled:hover {
+  background-color: #ccc;
+  transform: none;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 1.5vw;
+  font-size: 0.9vw;
+  color: #666;
+}
+
+.login-link a {
+  color: #ffb84d;
+  text-decoration: none;
+  font-weight: bold;
+  transition: color 0.3s ease;
+}
+
+.login-link a:hover {
+  color: #ff9f26;
+  text-decoration: underline;
+}
+
+/* 表單驗證樣式 */
+input:invalid {
+  border-color: #ff6b6b;
+}
+
+input:invalid:focus {
+  box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
+}
+
+/* 大螢幕版型 (1400px以上) */
+@media (min-width: 1400px) {
+  .register-container {
+    border-radius: 25px;
+    padding: 35px 50px;
+    max-width: 500px;
+  }
+
+  .register-header {
+    margin-bottom: 25px;
+  }
+
+  .register-header h2 {
+    font-size: 28px;
+    margin-right: 40px;
+  }
+
+  .register-form {
+    gap: 18px;
+  }
+
+  .form-group {
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 15px;
+  }
+
+  .form-group input {
+    font-size: 14px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .toggle-password img {
+    width: 15px;
+    height: 15px;
+  }
+
+  .terms-agree {
+    font-size: 13px;
+  }
+
+  .checkmark {
+    width: 15px;
+    height: 15px;
+    border-radius: 4px;
+    margin-right: 8px;
+  }
+
+  .register-btn {
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 25px;
+  }
+
+  .login-link {
+    font-size: 14px;
+  }
+}
+
+/* 平板版型 (768px - 1024px) */
+@media (max-width: 1024px) and (min-width: 769px) {
+  main.register-wrapper {
+    padding: 4vw;
+  }
+
+  .register-container {
+    border-radius: 3vw;
+    padding: 3.5vw 4.5vw;
+    max-width: 500px;
+  }
+
+  .register-header {
+    margin-bottom: 3vw;
+  }
+
+  .back-btn img {
+    width: 2.5vw;
+    height: 2.5vw;
+  }
+
+  .register-header h2 {
+    font-size: 3.2vw;
+    margin-right: 4vw;
+  }
+
+  .register-form {
+    gap: 2vw;
+  }
+
+  .form-group {
+    gap: 0.8vw;
+  }
+
+  .form-group label {
+    font-size: 1.6vw;
+  }
+
+  .form-group input {
+    font-size: 1.5vw;
+    padding: 1.8vw;
+    border-radius: 1.2vw;
+  }
+
+  .toggle-password img {
+    width: 1.8vw;
+    height: 1.8vw;
+  }
+
+  .terms-agree {
+    font-size: 1.4vw;
+  }
+
+  .checkmark {
+    width: 1.8vw;
+    height: 1.8vw;
+    border-radius: 0.4vw;
+    margin-right: 1vw;
+  }
+
+  .register-btn {
+    font-size: 1.8vw;
+    padding: 2vw;
+    border-radius: 3vw;
+  }
+
+  .login-link {
+    font-size: 1.5vw;
+  }
+}
+
+/* 手機版型 (小於768px) */
+@media (max-width: 768px) {
+  main.register-wrapper {
+    padding: 20px;
+  }
+
+  .register-container {
+    border-radius: 20px;
+    padding: 30px 25px;
+    max-width: 100%;
+  }
+
+  .register-header {
+    margin-bottom: 25px;
+  }
+
+  .back-btn {
+    padding: 8px;
+    margin-right: 15px;
+  }
+
+  .back-btn img {
+    width: 18px;
+    height: 18px;
+  }
+
+  .register-header h2 {
+    font-size: 22px;
+    margin-right: 30px;
+  }
+
+  .register-form {
+    gap: 18px;
+  }
+
+  .form-group {
+    gap: 6px;
+  }
+
+  .form-group label {
+    font-size: 15px;
+  }
+
+  .form-group input {
+    font-size: 16px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .toggle-password {
+    right: 14px;
+    padding: 4px;
+  }
+
+  .toggle-password img {
+    width: 15px;
+    height: 15px;
+  }
+
+  .terms-agree {
+    font-size: 13px;
+  }
+
+  .checkmark {
+    width: 15px;
+    height: 15px;
+    border-radius: 3px;
+    margin-right: 8px;
+    margin-top: 2px;
+  }
+
+  .register-btn {
+    font-size: 16px;
+    padding: 16px;
+    border-radius: 25px;
+    margin-top: 15px;
+  }
+
+  .login-link {
+    font-size: 14px;
+    margin-top: 20px;
+  }
+}

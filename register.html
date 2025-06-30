@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>會員註冊 - 芝山圓夢媒合站</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon">
+    <script src="header-component.js" defer></script>
+    <script src="footer-component.js" defer></script>
+    <link rel="stylesheet" href="css/register.css" />
+</head>
+
+<body>
+    <header-component></header-component>
+
+    <main class="register-wrapper">
+        <div class="register-container">
+            <div class="register-header">
+                <button class="back-btn" onclick="history.back()">
+                    <img src="img/right-arrow.png" alt="返回" />
+                </button>
+                <h2>會員註冊</h2>
+            </div>
+
+            <form class="register-form" id="registerForm">
+                <div class="form-group">
+                    <label for="name">姓名</label>
+                    <input type="text" id="name" name="name" placeholder="請輸入您的姓名" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="email">電子郵件</label>
+                    <input type="email" id="email" name="email" placeholder="請輸入電子郵件地址" required />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密碼</label>
+                    <div class="password-input">
+                        <input type="password" id="password" name="password" placeholder="請輸入密碼（至少8位字元）" required minlength="8" />
+                        <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                            <img src="img/eye.png" alt="顯示密碼" id="passwordEye" />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">確認密碼</label>
+                    <div class="password-input">
+                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="請再次輸入密碼" required minlength="8" />
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                            <img src="img/eye.png" alt="顯示密碼" id="confirmPasswordEye" />
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">手機號碼</label>
+                    <input type="tel" id="phone" name="phone" placeholder="請輸入手機號碼" required />
+                </div>
+
+                <!-- 移除身份選擇和專用欄位 -->
+                <!-- 
+                <div class="form-group">
+                    <label for="userType">身份類別</label>
+                    <select id="userType" name="userType" required>
+                        <option value="">請選擇身份</option>
+                        <option value="student">學生</option>
+                        <option value="company">企業</option>
+                    </select>
+                </div>
+
+                <div class="student-fields" id="studentFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="school">學校</label>
+                        <input type="text" id="school" name="school" placeholder="請輸入學校名稱" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="department">科系</label>
+                        <input type="text" id="department" name="department" placeholder="請輸入科系名稱" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="grade">年級</label>
+                        <select id="grade" name="grade">
+                            <option value="">請選擇年級</option>
+                            <option value="1">大一</option>
+                            <option value="2">大二</option>
+                            <option value="3">大三</option>
+                            <option value="4">大四</option>
+                            <option value="graduate">研究生</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="company-fields" id="companyFields" style="display: none;">
+                    <div class="form-group">
+                        <label for="companyName">公司名稱</label>
+                        <input type="text" id="companyName" name="companyName" placeholder="請輸入公司名稱" />
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="position">職位</label>
+                        <input type="text" id="position" name="position" placeholder="請輸入您的職位" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="industry">行業類別</label>
+                        <select id="industry" name="industry">
+                            <option value="">請選擇行業</option>
+                            <option value="technology">科技業</option>
+                            <option value="finance">金融業</option>
+                            <option value="manufacturing">製造業</option>
+                            <option value="retail">零售業</option>
+                            <option value="healthcare">醫療業</option>
+                            <option value="education">教育業</option>
+                            <option value="other">其他</option>
+                        </select>
+                    </div>
+                </div>
+                -->
+
+                <!-- <div class="form-options">
+                    <label class="terms-agree">
+                        <input type="checkbox" id="terms" name="terms" required />
+                        <span class="checkmark"></span>
+                        我同意<a href="#" class="terms-link">服務條款</a>和<a href="#" class="privacy-link">隱私政策</a>
+                    </label>
+                </div> -->
+
+                <button type="submit" class="register-btn" id="registerBtn">註冊</button>
+
+                <div class="login-link">
+                    已有帳號？<a href="login.html">立即登入</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer-component></footer-component>
+
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+            authDomain: "ntuedream.firebaseapp.com",
+            projectId: "ntuedream",
+            storageBucket: "ntuedream.firebasestorage.app",
+            messagingSenderId: "1052981554365",
+            appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+            measurementId: "G-SF8QTGQC1V"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 密碼加鹽和雜湊處理
+        async function hashPassword(password) {
+            // 生成隨機鹽值
+            const salt = crypto.getRandomValues(new Uint8Array(16));
+            const saltHex = Array.from(salt).map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            // 將密碼和鹽值合併
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password + saltHex);
+            
+            // 使用 SHA-256 雜湊
+            const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            
+            return {
+                hash: hashHex,
+                salt: saltHex
+            };
+        }
+
+        // 檢查電子郵件是否已存在
+        async function checkEmailExists(email) {
+            try {
+                const q = query(collection(db, "users"), where("email", "==", email.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+                return !querySnapshot.empty;
+            } catch (error) {
+                console.error("檢查郵件失敗:", error);
+                throw error;
+            }
+        }
+
+        // 切換密碼顯示/隱藏
+        window.togglePassword = function(fieldId) {
+            const passwordInput = document.getElementById(fieldId);
+            const eyeIcon = document.getElementById(fieldId + 'Eye');
+
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.src = 'img/hide-eye.png';
+                eyeIcon.alt = '隱藏密碼';
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.src = 'img/eye.png';
+                eyeIcon.alt = '顯示密碼';
+            }
+        }
+
+        // 移除身份切換相關的事件監聽器
+        /*
+        document.getElementById('userType').addEventListener('change', function() {
+            // 身份切換邏輯已移除
+        });
+        */
+
+        // 密碼確認驗證
+        function validatePassword() {
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const confirmPasswordInput = document.getElementById('confirmPassword');
+
+            if (password !== confirmPassword) {
+                confirmPasswordInput.setCustomValidity('密碼不相符');
+                return false;
+            } else {
+                confirmPasswordInput.setCustomValidity('');
+                return true;
+            }
+        }
+
+        // 即時密碼驗證
+        document.getElementById('confirmPassword').addEventListener('input', validatePassword);
+        document.getElementById('password').addEventListener('input', validatePassword);
+
+        // 表單提交處理
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const registerBtn = document.getElementById('registerBtn');
+            const originalText = registerBtn.textContent;
+
+            try {
+                // 驗證密碼
+                if (!validatePassword()) {
+                    alert('密碼確認不相符，請檢查後重新輸入');
+                    return;
+                }
+
+                // 禁用按鈕並顯示載入狀態
+                registerBtn.disabled = true;
+                registerBtn.textContent = '註冊中...';
+
+                const formData = new FormData(this);
+                const email = formData.get('email').toLowerCase().trim();
+                const password = formData.get('password');
+
+                // 檢查電子郵件是否已存在
+                const emailExists = await checkEmailExists(email);
+                if (emailExists) {
+                    alert('此電子郵件已被註冊，請使用其他郵件地址或前往登入頁面');
+                    return;
+                }
+
+                // 密碼加鹽雜湊
+                const hashedPassword = await hashPassword(password);
+
+                // 準備用戶資料（移除身份類型，設為預設值）
+                const userData = {
+                    name: formData.get('name').trim(),
+                    email: email,
+                    passwordHash: hashedPassword.hash,
+                    passwordSalt: hashedPassword.salt,
+                    phone: formData.get('phone').trim(),
+                    userType: 'general', // 設為通用使用者
+                    createdAt: serverTimestamp(),
+                    updatedAt: serverTimestamp(),
+                    lastLoginAt: null,
+                    isActive: true
+                };
+
+                // 移除身份特定資料的邏輯
+                /*
+                if (userData.userType === 'student') {
+                    userData.school = formData.get('school')?.trim() || '';
+                    userData.department = formData.get('department')?.trim() || '';
+                    userData.grade = formData.get('grade') || '';
+                } else if (userData.userType === 'company') {
+                    userData.companyName = formData.get('companyName')?.trim() || '';
+                    userData.position = formData.get('position')?.trim() || '';
+                    userData.industry = formData.get('industry') || '';
+                }
+                */
+
+                // 儲存到 Firestore
+                const docRef = await addDoc(collection(db, "users"), userData);
+
+                alert('註冊成功！請前往登入頁面使用您的帳號登入。');
+                
+                // 導向登入頁面
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('註冊失敗:', error);
+                
+                // 根據錯誤類型顯示不同訊息
+                let errorMessage = '註冊失敗，請稍後再試';
+                
+                if (error.code === 'permission-denied') {
+                    errorMessage = '權限不足，請聯絡管理員';
+                } else if (error.code === 'unavailable') {
+                    errorMessage = '網路連線問題，請檢查網路後再試';
+                }
+                
+                alert(errorMessage + '：' + error.message);
+                
+            } finally {
+                // 恢復按鈕狀態
+                registerBtn.disabled = false;
+                registerBtn.textContent = originalText;
+            }
+        });
+    </script>
+</body>
+
+</html>

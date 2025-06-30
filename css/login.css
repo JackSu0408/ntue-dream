@@ -23,7 +23,6 @@ main.login-wrapper {
   width: 100%;
   max-width: 450px;
   padding: 3vw 3.5vw;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   position: relative;
 }
 
@@ -181,13 +180,13 @@ main.login-wrapper {
 
 .forgot-password {
   font-size: 0.9vw;
-  color: #ffb84d;
+  color: #333;
   text-decoration: none;
   transition: color 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #ff9f26;
+  color: #0019fe;
   text-decoration: underline;
 }
 

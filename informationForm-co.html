@@ -5,6 +5,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>發佈提案 - 芝山圓夢媒合站</title>
+  <link rel="icon" href="img/favicon.png" type="image/x-icon">
   <script src="header-component.js" defer></script>
   <script src="footer-component.js" defer></script>
   <link rel="stylesheet" href="css/informationForm-co.css" />
@@ -41,6 +42,12 @@
       <label>截止日期</label>
       <input type="date" name="deadline" required />
 
+      <!-- 將檔案上傳區域改為連結輸入框 -->
+      <label>相關文件連結</label>
+      <input type="url" name="attachmentLink" placeholder="請輸入檔案連結 (例如：Google Drive、Dropbox 等分享連結)" />
+      
+      <!-- 註解掉原本的檔案上傳區域 -->
+      <!--
       <label>上傳附件文件</label>
       <div class="upload-area" id="uploadArea">
         <img src="img/upload.png" alt="upload icon" />
@@ -62,6 +69,7 @@
           <span class="progress-text" id="progressText">0%</span>
         </div>
       </div>
+      -->
 
       <button type="submit" class="submit-button" id="submitBtn">發佈 →</button>
     </form>
@@ -93,7 +101,7 @@
     // 暫時註解掉 Storage 初始化
     // const storage = getStorage(app);
 
-    // 暫時註解掉檔案相關變數和函數
+    // 註解掉所有檔案上傳相關的變數和函數
     /*
     // Global variables
     let selectedFile = null;
@@ -232,11 +240,30 @@
     const form = document.getElementById('proposalForm');
     const submitBtn = document.getElementById('submitBtn');
 
-    // Form submission (移除檔案上傳相關邏輯)
+    // 連結驗證函數
+    function validateURL(url) {
+      if (!url) return true; // 空值是允許的，因為連結是可選的
+      
+      try {
+        new URL(url);
+        return true;
+      } catch {
+        return false;
+      }
+    }
+
+    // Form submission (改為使用連結而非檔案上傳)
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       
       const formData = new FormData(form);
+      const attachmentLink = formData.get('attachmentLink');
+      
+      // 驗證連結格式
+      if (attachmentLink && !validateURL(attachmentLink)) {
+        alert('請輸入有效的連結格式（例如：https://example.com）');
+        return;
+      }
       
       try {
         submitBtn.disabled = true;
@@ -253,7 +280,12 @@
           createdAt: serverTimestamp()
         };
 
-        // 暫時註解掉檔案上傳邏輯
+        // 如果有提供連結，則添加到資料中
+        if (attachmentLink) {
+          data.attachmentLink = attachmentLink.trim();
+        }
+
+        // 註解掉原本的檔案上傳邏輯
         /*
         if (selectedFile) {
           submitBtn.textContent = '上傳檔案中...';
@@ -268,7 +300,6 @@
 
         alert('提案已成功提交！');
         form.reset();
-        // removeFile(); // 暫時註解掉
 
       } catch (error) {
         console.error('提交失敗:', error);

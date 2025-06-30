@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>提案總覽 - 芝山圓夢媒合站</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon">
     <script src="header-component.js" defer></script>
     <script src="footer-component.js" defer></script>
     <link rel="stylesheet" href="css/overview.css" />
@@ -17,7 +18,7 @@
         </div>
         
         <div class="load-more-container">
-            <button class="load-more-btn" id="loadMoreBtn">
+            <button class="load-more-btn" id="loadMoreBtn" style="display: none;">
                 查看更多 ↓
             </button>
         </div>
@@ -47,6 +48,7 @@
 
         let lastDoc = null;
         const proposalsPerPage = 6;
+        let totalProposalsLoaded = 0; // 追蹤已載入的提案數量
 
         // 格式化日期
         function formatDate(date) {
@@ -200,15 +202,49 @@
             alert(`查看提案詳情: ${proposalId}`);
         }
 
+        // 檢查是否還有更多提案的函數
+        async function checkIfMoreProposalsExist() {
+            try {
+                // 建立查詢，從當前最後一個文檔之後開始查詢 1 個文檔
+                let checkQuery = query(
+                    collection(db, "proposals"),
+                    orderBy("createdAt", "desc"),
+                    limit(1)
+                );
+
+                if (lastDoc) {
+                    checkQuery = query(
+                        collection(db, "proposals"),
+                        orderBy("createdAt", "desc"),
+                        startAfter(lastDoc),
+                        limit(1)
+                    );
+                }
+
+                const checkSnapshot = await getDocs(checkQuery);
+                return !checkSnapshot.empty;
+            } catch (error) {
+                console.error("檢查是否有更多提案時發生錯誤:", error);
+                return false;
+            }
+        }
+
         // 載入提案資料
         async function loadProposals(isLoadMore = false) {
             try {
                 const proposalsContainer = document.getElementById('proposalsContainer');
                 const loadMoreBtn = document.getElementById('loadMoreBtn');
                 
-                // 顯示載入中狀態
+                // 開始載入時立即隱藏按鈕
                 if (!isLoadMore) {
+                    loadMoreBtn.style.display = 'none';
                     proposalsContainer.innerHTML = '<p class="loading-message">載入中...</p>';
+                    totalProposalsLoaded = 0; // 重置計數器
+                } else {
+                    // 載入更多時也隱藏按鈕並顯示載入狀態
+                    loadMoreBtn.style.display = 'none';
+                    loadMoreBtn.textContent = '載入中...';
+                    loadMoreBtn.disabled = true;
                 }
                 
                 let q = query(
@@ -232,6 +268,7 @@
                     if (!isLoadMore) {
                         proposalsContainer.innerHTML = '<p class="no-proposals">目前沒有提案</p>';
                     }
+                    // 載入完成後確保按鈕保持隱藏
                     loadMoreBtn.style.display = 'none';
                     return;
                 }
@@ -251,17 +288,47 @@
                     proposalsContainer.innerHTML += createProposalCard(proposal, index);
                 });
 
-                // 如果返回的文檔少於每頁數量，隱藏載入更多按鈕
-                if (querySnapshot.docs.length < proposalsPerPage) {
-                    loadMoreBtn.style.display = 'none';
+                // 更新已載入的提案數量
+                totalProposalsLoaded += proposals.length;
+
+                // 恢復按鈕狀態
+                if (isLoadMore) {
+                    loadMoreBtn.textContent = '查看更多 ↓';
+                    loadMoreBtn.disabled = false;
+                }
+
+                // 判斷是否顯示「查看更多」按鈕
+                if (!isLoadMore) {
+                    // 第一次載入：如果載入的提案數量等於每頁數量，檢查是否還有更多
+                    if (querySnapshot.docs.length === proposalsPerPage) {
+                        const hasMore = await checkIfMoreProposalsExist();
+                        loadMoreBtn.style.display = hasMore ? 'block' : 'none';
+                    } else {
+                        // 如果第一次載入就少於 6 個，不顯示按鈕
+                        loadMoreBtn.style.display = 'none';
+                    }
                 } else {
-                    loadMoreBtn.style.display = 'block';
+                    // 載入更多：如果返回的文檔少於每頁數量，隱藏載入更多按鈕
+                    if (querySnapshot.docs.length < proposalsPerPage) {
+                        loadMoreBtn.style.display = 'none';
+                    } else {
+                        // 如果還有滿頁的數據，檢查是否還有更多
+                        const hasMore = await checkIfMoreProposalsExist();
+                        loadMoreBtn.style.display = hasMore ? 'block' : 'none';
+                    }
                 }
 
             } catch (error) {
                 console.error("載入提案時發生錯誤:", error);
-                document.getElementById('proposalsContainer').innerHTML = 
-                    '<p class="error-message">載入提案時發生錯誤，請稍後再試</p>';
+                const proposalsContainer = document.getElementById('proposalsContainer');
+                const loadMoreBtn = document.getElementById('loadMoreBtn');
+                
+                proposalsContainer.innerHTML = '<p class="error-message">載入提案時發生錯誤，請稍後再試</p>';
+                
+                // 錯誤狀態下恢復按鈕
+                loadMoreBtn.style.display = 'none';
+                loadMoreBtn.textContent = '查看更多 ↓';
+                loadMoreBtn.disabled = false;
             }
         }
 

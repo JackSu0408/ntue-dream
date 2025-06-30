@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>會員登入 - 芝山圓夢媒合站</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon">
     <script src="header-component.js" defer></script>
     <script src="footer-component.js" defer></script>
     <link rel="stylesheet" href="css/login.css" />
@@ -25,7 +26,7 @@
             <form class="login-form" id="loginForm">
                 <div class="form-group">
                     <label for="account">帳號</label>
-                    <input type="text" id="account" name="account" placeholder="請輸入帳號或電子郵件" required />
+                    <input type="text" id="account" name="account" placeholder="請輸入電子郵件" required />
                 </div>
 
                 <div class="form-group">
@@ -41,84 +42,207 @@
                 <div class="form-options">
                     <label class="remember-me">
                         <input type="checkbox" id="remember" name="remember" />
-                        <span class="checkmark"></span>
-                        記住我
+                        <!-- <span class="checkmark"></span>
+                        記住我 -->
                     </label>
                     <a href="#" class="forgot-password">忘記密碼？</a>
                 </div>
 
-                <button type="submit" class="login-btn">登入</button>
+                <button type="submit" class="login-btn" id="loginBtn">登入</button>
 
                 <button type="button" class="register-btn" onclick="location.href='register.html'">註冊</button>
-
-                <!-- 暫時註解掉社交登入功能 -->
-                <!--
-                <div class="divider">
-                    <span>或</span>
-                </div>
-
-                <button type="button" class="social-btn google-btn">
-                    <img src="img/google.png" alt="Google" />
-                    使用 Google 帳號登入
-                </button>
-
-                <button type="button" class="social-btn facebook-btn">
-                    <img src="img/facebook.png" alt="Facebook" />
-                    使用 Facebook 帳號登入
-                </button>
-                -->
             </form>
         </div>
     </main>
 
     <footer-component></footer-component>
 
-    <script>
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs, doc, updateDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // Firebase 配置
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+            authDomain: "ntuedream.firebaseapp.com",
+            projectId: "ntuedream",
+            storageBucket: "ntuedream.firebasestorage.app",
+            messagingSenderId: "1052981554365",
+            appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+            measurementId: "G-SF8QTGQC1V"
+        };
+
+        // 初始化 Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 驗證密碼
+        async function verifyPassword(inputPassword, storedHash, storedSalt) {
+            try {
+                // 將輸入密碼與儲存的鹽值合併
+                const encoder = new TextEncoder();
+                const data = encoder.encode(inputPassword + storedSalt);
+                
+                // 使用 SHA-256 雜湊
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                // 比較雜湊值
+                return hashHex === storedHash;
+            } catch (error) {
+                console.error('密碼驗證失敗:', error);
+                return false;
+            }
+        }
+
+        // 使用者登入函數
+        async function loginUser(email, password) {
+            try {
+                // 查詢使用者
+                const q = query(collection(db, "users"), where("email", "==", email.toLowerCase()));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    throw new Error('帳號不存在');
+                }
+
+                const userDoc = querySnapshot.docs[0];
+                const userData = userDoc.data();
+
+                // 檢查帳號是否啟用
+                if (!userData.isActive) {
+                    throw new Error('帳號已被停用，請聯絡管理員');
+                }
+
+                // 驗證密碼
+                const isPasswordValid = await verifyPassword(password, userData.passwordHash, userData.passwordSalt);
+                
+                if (!isPasswordValid) {
+                    throw new Error('密碼錯誤');
+                }
+
+                // 更新最後登入時間
+                await updateDoc(doc(db, "users", userDoc.id), {
+                    lastLoginAt: serverTimestamp(),
+                    updatedAt: serverTimestamp()
+                });
+
+                // 儲存登入狀態到 localStorage
+                const loginData = {
+                    userId: userDoc.id,
+                    name: userData.name,
+                    email: userData.email,
+                    userType: userData.userType,
+                    loginTime: new Date().toISOString()
+                };
+
+                localStorage.setItem('ntueDreamUser', JSON.stringify(loginData));
+
+                return { success: true, userData: loginData };
+
+            } catch (error) {
+                console.error('登入失敗:', error);
+                return { success: false, error: error.message };
+            }
+        }
+
         // 切換密碼顯示/隱藏
-        function togglePassword() {
+        window.togglePassword = function() {
             const passwordInput = document.getElementById('password');
             const eyeIcon = document.getElementById('eyeIcon');
 
             if (passwordInput.type === 'password') {
-                // 密碼隱藏狀態 → 顯示密碼
                 passwordInput.type = 'text';
-                eyeIcon.src = 'img/hide-eye.png';  // 密碼可視時顯示隱藏圖示
+                eyeIcon.src = 'img/hide-eye.png';
                 eyeIcon.alt = '隱藏密碼';
             } else {
-                // 密碼顯示狀態 → 隱藏密碼
                 passwordInput.type = 'password';
-                eyeIcon.src = 'img/eye.png';       // 密碼隱藏時顯示顯示圖示
+                eyeIcon.src = 'img/eye.png';  
                 eyeIcon.alt = '顯示密碼';
             }
         }
 
         // 表單提交處理
-        document.getElementById('loginForm').addEventListener('submit', function (e) {
+        document.getElementById('loginForm').addEventListener('submit', async function (e) {
             e.preventDefault();
 
-            const formData = new FormData(this);
-            const account = formData.get('account');
-            const password = formData.get('password');
-            const remember = formData.get('remember');
+            const loginBtn = document.getElementById('loginBtn');
+            const originalText = loginBtn.textContent;
 
-            // 這裡可以添加實際的登入邏輯
-            console.log('登入資料:', { account, password, remember });
+            try {
+                // 禁用按鈕並顯示載入狀態
+                loginBtn.disabled = true;
+                loginBtn.textContent = '登入中...';
 
-            // 暫時的提示
-            alert('登入功能開發中...');
+                const formData = new FormData(this);
+                const email = formData.get('account').toLowerCase().trim();
+                const password = formData.get('password');
+                const remember = formData.get('remember');
+
+                // 基本驗證
+                if (!email || !password) {
+                    alert('請輸入電子郵件和密碼');
+                    return;
+                }
+
+                // 執行登入
+                const result = await loginUser(email, password);
+
+                if (result.success) {
+                    // 如果選擇記住我，設定較長的過期時間
+                    if (remember) {
+                        const expireTime = new Date();
+                        expireTime.setDate(expireTime.getDate() + 30); // 30天後過期
+                        localStorage.setItem('ntueDreamUserExpire', expireTime.toISOString());
+                    }
+
+                    alert(`歡迎回來，${result.userData.name}！`);
+                    
+                    // 導向首頁或用戶原本要去的頁面
+                    const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                    sessionStorage.removeItem('redirectAfterLogin');
+                    window.location.href = redirectUrl;
+
+                } else {
+                    alert('登入失敗：' + result.error);
+                }
+
+            } catch (error) {
+                console.error('登入處理失敗:', error);
+                alert('登入失敗，請稍後再試：' + error.message);
+                
+            } finally {
+                // 恢復按鈕狀態
+                loginBtn.disabled = false;
+                loginBtn.textContent = originalText;
+            }
         });
 
-        // 暫時註解掉社交登入按鈕事件
-        /*
-        // 社交登入按鈕事件
-        document.querySelector('.google-btn').addEventListener('click', function () {
-            alert('Google 登入功能開發中...');
+        // 頁面載入時檢查是否已登入
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedUser = localStorage.getItem('ntueDreamUser');
+            const userExpire = localStorage.getItem('ntueDreamUserExpire');
+            
+            if (savedUser) {
+                // 檢查是否過期
+                if (userExpire) {
+                    const expireDate = new Date(userExpire);
+                    if (new Date() > expireDate) {
+                        // 已過期，清除登入狀態
+                        localStorage.removeItem('ntueDreamUser');
+                        localStorage.removeItem('ntueDreamUserExpire');
+                        return;
+                    }
+                }
+                
+                // 如果已登入，詢問是否要直接進入
+                const userData = JSON.parse(savedUser);
+                confirm(`您已經登入了`)
+                window.location.href = 'index.html';
+            }
         });
-
-        document.querySelector('.facebook-btn').addEventListener('click', function () {
-            alert('Facebook 登入功能開發中...');
-        });
-        */
     </script>
 </body>
 
