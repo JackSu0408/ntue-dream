@@ -196,10 +196,8 @@
 
         // 查看提案詳情的函數
         window.viewProposalDetails = function(proposalId) {
-            // 這裡可以導向到詳細頁面或開啟彈窗
-            console.log('查看提案詳情:', proposalId);
-            // 例如：window.location.href = `proposal-detail.html?id=${proposalId}`;
-            alert(`查看提案詳情: ${proposalId}`);
+            // 導向提案詳情頁面
+            window.location.href = `proposal-detail.html?id=${proposalId}`;
         }
 
         // 檢查是否還有更多提案的函數

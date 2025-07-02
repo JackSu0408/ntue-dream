@@ -13,7 +13,7 @@
   <header-component></header-component>
 
   <main class="form-wrapper">
-    <form class="proposal-form">
+    <form class="proposal-form" id="proposalForm">
       <h2>發佈提案</h2>
 
       <label>姓名</label>
@@ -29,7 +29,7 @@
       <textarea name="description" rows="5" placeholder="詳細描述您的提案內容、目標" required></textarea>
 
       <label>專案類別</label>
-      <select name="category" required>
+      <select name="category" id="categorySelect" required>
         <option value="">請選擇類別</option>
         <option value="數位醫療">數位醫療</option>
         <option value="AI應用">AI應用</option>
@@ -37,15 +37,21 @@
         <option value="其他">其他</option>
       </select>
 
+      <!-- 自訂類別輸入框 -->
+      <div id="customCategoryDiv" style="display: none;">
+        <label>請輸入自訂類別</label>
+        <input type="text" id="customCategoryInput" name="customCategory" placeholder="請輸入您的專案類別" />
+      </div>
+
       <label>預算範圍</label>
-      <input type="number" name="budget" placeholder="請輸入預期的預算金額 (單位：25000–30000)" required />
+      <input type="number" name="budget" placeholder="請輸入預期的預算金額" required />
 
       <label>截止日期</label>
       <input type="date" name="deadline" required />
 
       <!-- 將檔案上傳區域改為連結輸入框 -->
-      <label>作品集或相關資料連結</label>
-      <input type="url" name="attachmentLink" placeholder="請輸入作品集或相關資料連結 (例如：GitHub、Behance、Google Drive 等)" />
+      <label>相關文件連結</label>
+      <input type="url" name="attachmentLink" placeholder="請輸入檔案連結" />
 
       <!-- 註解掉原本的檔案上傳區域 -->
       <!--
@@ -64,12 +70,11 @@
   <footer-component></footer-component>
 
   <script type="module">
-    // Import the functions you need from the SDKs you need
+    // Import Firebase functions
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-analytics.js";
     import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-    // Your web app's Firebase configuration
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
       authDomain: "ntuedream.firebaseapp.com",
@@ -82,12 +87,41 @@
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
-    const analytics = getAnalytics(app);
     const db = getFirestore(app);
+
+    // 檢查登入狀態
+    function checkLoginStatus() {
+      const savedUser = localStorage.getItem('ntueDreamUser');
+      const userExpire = localStorage.getItem('ntueDreamUserExpire');
+      
+      if (!savedUser) {
+        return null;
+      }
+      
+      // 檢查是否過期
+      if (userExpire) {
+        const expireDate = new Date(userExpire);
+        if (new Date() > expireDate) {
+          // 已過期，清除登入狀態
+          localStorage.removeItem('ntueDreamUser');
+          localStorage.removeItem('ntueDreamUserExpire');
+          return null;
+        }
+      }
+      
+      try {
+        return JSON.parse(savedUser);
+      } catch (error) {
+        console.error('解析用戶資料失敗:', error);
+        localStorage.removeItem('ntueDreamUser');
+        localStorage.removeItem('ntueDreamUserExpire');
+        return null;
+      }
+    }
 
     // 連結驗證函數
     function validateURL(url) {
-      if (!url) return true; // 空值是允許的，因為連結是可選的
+      if (!url) return true;
       
       try {
         new URL(url);
@@ -97,9 +131,55 @@
       }
     }
 
+    // 頁面載入時檢查登入狀態
+    document.addEventListener('DOMContentLoaded', function() {
+      const userData = checkLoginStatus();
+      
+      if (!userData) {
+        // 未登入，顯示提示並導向登入頁面
+        const shouldLogin = confirm('您需要先登入才能發佈提案。\n\n點擊「確定」前往登入頁面，點擊「取消」返回首頁。');
+        
+        if (shouldLogin) {
+          // 儲存當前頁面，登入後返回
+          sessionStorage.setItem('redirectAfterLogin', window.location.href);
+          window.location.href = 'login.html';
+        } else {
+          window.location.href = 'index.html';
+        }
+        return;
+      }
+      
+      // 已登入，可以正常使用表單
+      console.log('歡迎，' + userData.name + '！您可以開始填寫提案表單。');
+    });
+
+    // 處理類別選擇
+    document.getElementById('categorySelect').addEventListener('change', function() {
+      const customCategoryDiv = document.getElementById('customCategoryDiv');
+      const customCategoryInput = document.getElementById('customCategoryInput');
+      
+      if (this.value === '其他') {
+        customCategoryDiv.style.display = 'block';
+        customCategoryInput.setAttribute('required', '');
+      } else {
+        customCategoryDiv.style.display = 'none';
+        customCategoryInput.removeAttribute('required');
+        customCategoryInput.value = '';
+      }
+    });
+
     // 表單提交處理
-    document.querySelector(".proposal-form").addEventListener("submit", async function (e) {
+    document.getElementById('proposalForm').addEventListener('submit', async function (e) {
       e.preventDefault();
+
+      // 再次檢查登入狀態（防止表單提交時登入過期）
+      const userData = checkLoginStatus();
+      if (!userData) {
+        alert('登入狀態已過期，請重新登入。');
+        sessionStorage.setItem('redirectAfterLogin', window.location.href);
+        window.location.href = 'login.html';
+        return;
+      }
 
       const form = e.target;
       const submitBtn = form.querySelector('.submit-button');
@@ -107,6 +187,16 @@
       
       const formData = new FormData(form);
       const attachmentLink = formData.get('attachmentLink');
+      
+      // 處理類別資料
+      let selectedCategory = formData.get('category');
+      if (selectedCategory === '其他') {
+        selectedCategory = formData.get('customCategory');
+        if (!selectedCategory || selectedCategory.trim() === '') {
+          alert('請輸入自訂類別');
+          return;
+        }
+      }
       
       // 驗證連結格式
       if (attachmentLink && !validateURL(attachmentLink)) {
@@ -119,11 +209,17 @@
         department: formData.get('department'),
         summary: formData.get('summary'),
         description: formData.get('description'),
-        category: formData.get('category'),
+        category: selectedCategory,
         budget: parseInt(formData.get('budget')),
         deadline: formData.get('deadline'),
         createdAt: serverTimestamp(),
-        type: 'student' // 標記這是學生提案
+        type: 'student',
+        
+        // 新增：記錄提案作者資訊
+        authorId: userData.userId,
+        authorName: userData.name,
+        authorEmail: userData.email,
+        authorType: userData.userType || 'general'
       };
 
       // 如果有提供連結，則添加到資料中
@@ -135,13 +231,24 @@
         submitBtn.disabled = true;
         submitBtn.textContent = '提交中...';
         
-        await addDoc(collection(db, "proposals"), data);
-        alert("提案已成功提交！");
-        form.reset();
+        const docRef = await addDoc(collection(db, "proposals"), data);
         
-      } catch (err) {
-        console.error("送出失敗", err);
-        alert("提交失敗，請稍後再試：" + err.message);
+        // alert('提案已成功提交！\n\n您可以在「我的提案」中查看和管理您的提案。');
+        
+        // 提交成功後導向提案總覽頁面
+        window.location.href = 'overview.html';
+        
+      } catch (error) {
+        console.error("提交失敗:", error);
+        
+        let errorMessage = '提交失敗，請稍後再試';
+        if (error.code === 'permission-denied') {
+          errorMessage = '權限不足，請確認您的登入狀態';
+        } else if (error.code === 'unavailable') {
+          errorMessage = '網路連線問題，請檢查網路後再試';
+        }
+        
+        alert(errorMessage + '：' + error.message);
         
       } finally {
         submitBtn.disabled = false;

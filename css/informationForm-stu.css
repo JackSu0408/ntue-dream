@@ -87,6 +87,38 @@ main.form-wrapper {
   font-family: inherit;
 }
 
+/* 自訂類別輸入框樣式 */
+#customCategoryDiv {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+#customCategoryDiv label {
+  font-size: 1.1vw;
+  font-weight: bold;
+  margin-top: 0.5vw;
+  margin-bottom: 0.5vw;
+  color: #333;
+}
+
+#customCategoryDiv input[type="text"] {
+  width: 100%;
+  font-size: 1vw;
+  padding: 1vw;
+  border: 1px solid #ddd;
+  border-radius: 0.5vw;
+  box-sizing: border-box;
+  background-color: white;
+  color: #333;
+  margin-top: 1vw;
+}
+
+#customCategoryDiv input[type="text"]:focus {
+  outline: none;
+  border-color: #ffb84d;
+  box-shadow: 0 0 0 2px rgba(255, 184, 77, 0.2);
+}
+
 /* 註解掉檔案上傳相關樣式 */
 /*
 .upload-area {
@@ -204,6 +236,20 @@ main.form-wrapper {
         padding-right: 3.5vw;
     }
 
+    /* 平板版自訂類別樣式 */
+    #customCategoryDiv label {
+        font-size: 1.8vw;
+        margin-top: 1vw;
+        margin-bottom: 0.8vw;
+    }
+
+    #customCategoryDiv input[type="text"] {
+        font-size: 1.6vw;
+        padding: 1.5vw;
+        border-radius: 1vw;
+        margin-top: 1.6vw;
+    }
+
     .proposal-form textarea {
         min-height: 12vw;
     }
@@ -255,6 +301,20 @@ main.form-wrapper {
     .proposal-form select {
         background-size: 12px;
         padding-right: 40px;
+    }
+
+    /* 手機版自訂類別樣式 */
+    #customCategoryDiv label {
+        font-size: 16px;
+        margin-top: 10px;
+        margin-bottom: 8px;
+    }
+
+    #customCategoryDiv input[type="text"] {
+        font-size: 16px;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 16px;
     }
 
     .proposal-form textarea {

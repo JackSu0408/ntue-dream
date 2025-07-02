@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>提案詳情 - 芝山圓夢媒合站</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon">
+    <script src="header-component.js" defer></script>
+    <script src="footer-component.js" defer></script>
+    <link rel="stylesheet" href="css/proposal-detail.css" />
+</head>
+<body>
+    <header-component></header-component>
+
+    <main class="detail-section">
+        <div class="detail-container">
+            <!-- 返回按鈕 -->
+            <div class="back-navigation">
+                <button class="back-btn" onclick="history.back()">
+                    <img src="img/right-arrow.png" alt="返回" />
+                    返回提案總覽
+                </button>
+            </div>
+
+            <!-- 提案詳情卡片 -->
+            <div class="proposal-detail-card" id="proposalDetailCard">
+                <!-- 載入中狀態 -->
+                <div class="loading-state" id="loadingState">
+                    <p>載入中...</p>
+                </div>
+
+                <!-- 錯誤狀態 -->
+                <div class="error-state" id="errorState" style="display: none;">
+                    <p>載入提案詳情時發生錯誤</p>
+                    <button onclick="location.href='overview.html'" class="retry-btn">返回提案總覽</button>
+                </div>
+
+                <!-- 提案內容將由JavaScript動態生成 -->
+            </div>
+        </div>
+    </main>
+
+    <footer-component></footer-component>
+
+    <script type="module">
+        // Import Firebase functions
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDDJ9_uXb5WgmhRxta4Atzrbo-FE7u_cko",
+            authDomain: "ntuedream.firebaseapp.com",
+            projectId: "ntuedream",
+            storageBucket: "ntuedream.firebasestorage.app",
+            messagingSenderId: "1052981554365",
+            appId: "1:1052981554365:web:dc971a29c9ba37cdf71bd4",
+            measurementId: "G-SF8QTGQC1V"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // 格式化日期
+        function formatDate(date) {
+            if (!date) return '未提供';
+            const d = date.toDate ? date.toDate() : new Date(date);
+            return d.toLocaleDateString('zh-TW', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // 格式化預算
+        function formatBudget(budget) {
+            if (!budget) return 'NT$ 面議';
+            const budgetNum = parseInt(budget);
+            if (isNaN(budgetNum)) return 'NT$ 面議';
+            
+            if (budgetNum >= 1000) {
+                return `NT$ ${(budgetNum / 1000).toFixed(0)}K`;
+            } else {
+                return `NT$ ${budgetNum.toLocaleString()}`;
+            }
+        }
+
+        // 計算時間差
+        function calculateTimeAgo(createdAt) {
+            if (!createdAt) return '時間未知';
+            
+            const now = new Date();
+            const created = createdAt.toDate ? createdAt.toDate() : new Date(createdAt);
+            const diffInMs = now - created;
+            const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+            const diffInHours = Math.floor(diffInMinutes / 60);
+            const diffInDays = Math.floor(diffInHours / 24);
+            const diffInWeeks = Math.floor(diffInDays / 7);
+            
+            if (diffInMinutes < 60) {
+                return diffInMinutes <= 1 ? '剛剛發佈' : `${diffInMinutes}分鐘前發佈`;
+            } else if (diffInHours < 24) {
+                return `${diffInHours}小時前發佈`;
+            } else if (diffInDays === 1) {
+                return '1天前發佈';
+            } else if (diffInDays < 7) {
+                return `${diffInDays}天前發佈`;
+            } else if (diffInWeeks === 1) {
+                return '1週前發佈';
+            } else {
+                return `${diffInWeeks}週前發佈`;
+            }
+        }
+
+        // 生成提案詳情HTML
+        function generateProposalDetailHTML(proposal) {
+            const isCompany = proposal.type === 'company';
+            const cardClass = isCompany ? 'company' : 'student';
+            const iconSrc = isCompany ? 'img/office.png' : 'img/student.png';
+            const typeText = isCompany ? '企業提案' : '學生提案';
+            
+            // 處理標題和發佈者資訊
+            let displayTitle, publisherInfo, additionalInfo = '';
+            
+            if (isCompany) {
+                displayTitle = proposal.title || '企業提案';
+                publisherInfo = proposal.summary || '企業名稱';
+            } else {
+                displayTitle = proposal.summary || '學生提案';
+                publisherInfo = proposal.name || '學生姓名';
+                if (proposal.department) {
+                    additionalInfo = `<div class="additional-info">
+                        <span class="info-label">科系：</span>
+                        <span class="info-value">${proposal.department}</span>
+                    </div>`;
+                }
+            }
+
+            const timeAgo = calculateTimeAgo(proposal.createdAt);
+            const formattedBudget = formatBudget(proposal.budget);
+            const deadlineDate = formatDate(proposal.deadline);
+
+            return `
+                <div class="detail-header ${cardClass}">
+                    <div class="header-content">
+                        <div class="header-left">
+                            <div class="proposal-icon">
+                                <img src="${iconSrc}" alt="${typeText}" onerror="this.src='img/default-icon.png'">
+                            </div>
+                            <div class="proposal-meta">
+                                <div class="proposal-type">${typeText}</div>
+                                <h1 class="proposal-title">${displayTitle}</h1>
+                                <div class="publisher-info">
+                                    <span class="publisher-label">${isCompany ? '企業名稱：' : '發佈者：'}</span>
+                                    <span class="publisher-name">${publisherInfo}</span>
+                                </div>
+                                ${additionalInfo}
+                            </div>
+                        </div>
+                        <div class="header-right">
+                            <div class="publish-time">${timeAgo}</div>
+                            <div class="budget-display">${formattedBudget}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detail-content">
+                    <div class="content-section">
+                        <h3 class="section-title">專案描述</h3>
+                        <div class="section-content">
+                            <p class="description-text">${proposal.description || '暫無詳細描述'}</p>
+                        </div>
+                    </div>
+
+                    <div class="content-grid">
+                        <div class="info-card">
+                            <h4 class="info-title">專案類別</h4>
+                            <div class="category-tag">${proposal.category || '未分類'}</div>
+                        </div>
+
+                        <div class="info-card">
+                            <h4 class="info-title">預算範圍</h4>
+                            <div class="budget-info">${formattedBudget}</div>
+                        </div>
+
+                        <div class="info-card">
+                            <h4 class="info-title">截止日期</h4>
+                            <div class="deadline-info">${deadlineDate}</div>
+                        </div>
+
+                        ${proposal.attachmentLink ? `
+                        <div class="info-card">
+                            <h4 class="info-title">相關資料</h4>
+                            <div class="attachment-info">
+                                <a href="${proposal.attachmentLink}" target="_blank" rel="noopener noreferrer" class="attachment-link">
+                                    <img src="img/link.png" alt="連結" class="link-icon" onerror="this.style.display='none'">
+                                    查看相關文件
+                                </a>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+
+                    ${proposal.authorName ? `
+                    <div class="author-section">
+                        <h3 class="section-title">發佈者資訊</h3>
+                        <div class="author-info">
+                            <div class="author-detail">
+                                <span class="author-label">姓名：</span>
+                                <span class="author-value">${proposal.authorName}</span>
+                            </div>
+                            ${proposal.authorEmail ? `
+                            <div class="author-detail">
+                                <span class="author-label">聯絡方式：</span>
+                                <span class="author-value">${proposal.authorEmail}</span>
+                            </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <div class="action-section">
+                        <button class="contact-btn" onclick="contactProposer('${proposal.id}')">
+                            聯繫發佈者
+                        </button>
+                        <button class="back-btn-secondary" onclick="history.back()">
+                            返回列表
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 聯繫發佈者功能
+        window.contactProposer = function(proposalId) {
+            // 這裡可以實作聯絡功能，例如開啟郵件或顯示聯絡表單
+            alert('聯絡功能開發中...\n\n此功能將包含：\n• 發送站內訊息\n• 郵件通知\n• 聯絡資訊展示');
+        };
+
+        // 載入提案詳情
+        async function loadProposalDetail() {
+            try {
+                // 從URL參數獲取提案ID
+                const urlParams = new URLSearchParams(window.location.search);
+                const proposalId = urlParams.get('id');
+
+                if (!proposalId) {
+                    throw new Error('未提供提案ID');
+                }
+
+                // 從Firestore獲取提案詳情
+                const docRef = doc(db, "proposals", proposalId);
+                const docSnap = await getDoc(docRef);
+
+                if (!docSnap.exists()) {
+                    throw new Error('提案不存在');
+                }
+
+                const proposalData = { id: docSnap.id, ...docSnap.data() };
+
+                // 隱藏載入狀態
+                document.getElementById('loadingState').style.display = 'none';
+
+                // 生成並插入提案詳情HTML
+                const detailCard = document.getElementById('proposalDetailCard');
+                detailCard.innerHTML = generateProposalDetailHTML(proposalData);
+
+                // 更新頁面標題
+                document.title = `${proposalData.title || proposalData.summary || '提案詳情'} - 芝山圓夢媒合站`;
+
+            } catch (error) {
+                console.error('載入提案詳情失敗:', error);
+                
+                // 隱藏載入狀態，顯示錯誤狀態
+                document.getElementById('loadingState').style.display = 'none';
+                document.getElementById('errorState').style.display = 'block';
+            }
+        }
+
+        // 頁面載入時執行
+        document.addEventListener('DOMContentLoaded', () => {
+            loadProposalDetail();
+        });
+    </script>
+</body>
+</html>
