@@ -2,7 +2,7 @@ body {
   margin: 0;
   padding: 0;
   font-family: "Noto Sans TC", sans-serif;
-  background-color: #f5f5dc; /* 與其他頁面一致的米白色背景 */
+  background-color: #f5f5dc;
   color: #333;
   display: flex;
   flex-direction: column;
@@ -18,12 +18,17 @@ main.login-wrapper {
 }
 
 .login-container {
-  background-color: #dcdcc0; /* 與 footer 一致的淺灰色 */
+  background-color: #dcdcc0;
   border-radius: 2vw;
   width: 100%;
   max-width: 450px;
   padding: 3vw 3.5vw;
   position: relative;
+  transition: transform 0.3s ease;
+}
+
+.login-container:hover {
+  transform: translateY(-2px);
 }
 
 .login-header {
@@ -40,13 +45,23 @@ main.login-wrapper {
   padding: 0.5vw;
   margin-right: 1vw;
   border-radius: 50%;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+}
+
+.back-btn:hover {
+  background-color: rgba(255, 184, 77, 0.1);
+  transform: scale(1.1);
 }
 
 .back-btn img {
   width: 2vw;
   height: 2vw;
-  transform:rotate(180deg);
+  transform: rotate(180deg);
+  transition: opacity 0.3s ease;
+}
+
+.back-btn:hover img {
+  opacity: 0.8;
 }
 
 .login-header h2 {
@@ -56,7 +71,7 @@ main.login-wrapper {
   margin: 0;
   flex-grow: 1;
   text-align: center;
-  margin-right: 3vw; /* 平衡返回按鈕的空間 */
+  margin-right: 3vw;
 }
 
 .login-form {
@@ -72,28 +87,35 @@ main.login-wrapper {
 }
 
 .form-group label {
-  font-size: 1.1vw;
+  font-size: 1.3vw;
   font-weight: bold;
   color: #333;
+  margin-bottom: 0.5vw;
+}
+
+.input-wrapper {
+  position: relative;
+  width: 100%;
 }
 
 .form-group input[type="text"],
 .form-group input[type="password"] {
   width: 100%;
-  font-size: 1vw;
+  font-size: 1.2vw; /* 從 1vw 增大到 1.2vw */
   padding: 1.2vw;
   border: 1px solid #ccc;
   border-radius: 0.8vw;
   box-sizing: border-box;
   background-color: white;
   color: #333;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s ease;
+  padding-right: 3vw;
 }
 
 .form-group input:focus {
   outline: none;
   border-color: #ffb84d;
-  box-shadow: 0 0 0 2px rgba(255, 184, 77, 0.2);
+  transform: translateY(-1px);
 }
 
 .password-input {
@@ -102,19 +124,25 @@ main.login-wrapper {
 
 .toggle-password {
   position: absolute;
-  right: 1vw;
+  right: 0.8vw;
   top: 50%;
   transform: translateY(-50%);
   background: none;
   border: none;
   cursor: pointer;
-  padding: 0.3vw;
-  border-radius: 4px;
-  transition: background-color 0.3s ease;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: auto;
+  height: auto;
+  z-index: 10;
+  outline: none; /* 移除 focus 外框 */
 }
 
-.toggle-password:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.toggle-password:focus {
+  outline: none; /* 移除 focus 外框 */
+  box-shadow: none; /* 移除可能的 box-shadow */
 }
 
 .toggle-password img {
@@ -123,11 +151,35 @@ main.login-wrapper {
   min-width: 16px;
   min-height: 16px;
   opacity: 0.6;
-  transition: opacity 0.3s ease;
+  border: none; /* 移除圖片邊框 */
+  outline: none; /* 移除圖片外框 */
+  box-shadow: none; /* 移除陰影 */
+  background: none; /* 移除背景 */
 }
 
 .toggle-password:hover img {
   opacity: 0.8;
+  border: none; /* 確保 hover 時也沒有邊框 */
+  outline: none;
+  box-shadow: none;
+}
+
+.toggle-password:focus img {
+  border: none; /* 確保 focus 時也沒有邊框 */
+  outline: none;
+  box-shadow: none;
+}
+
+.toggle-password:active {
+  outline: none; /* 移除點擊時的外框 */
+  box-shadow: none;
+  border: none;
+}
+
+.toggle-password:active img {
+  border: none;
+  outline: none;
+  box-shadow: none;
 }
 
 .form-options {
@@ -141,8 +193,13 @@ main.login-wrapper {
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-size: 0.9vw;
+  font-size: 1vw;
   color: #666;
+  transition: color 0.3s ease;
+}
+
+.remember-me:hover {
+  color: #333;
 }
 
 .remember-me input[type="checkbox"] {
@@ -179,15 +236,16 @@ main.login-wrapper {
 }
 
 .forgot-password {
-  font-size: 0.9vw;
+  font-size: 1vw;
   color: #333;
   text-decoration: none;
-  transition: color 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .forgot-password:hover {
-  color: #0019fe;
+  color: #ffb84d;
   text-decoration: underline;
+  transform: translateY(-1px);
 }
 
 .login-btn,
@@ -204,7 +262,7 @@ main.login-wrapper {
 }
 
 .login-btn {
-  background-color: #2c3e50; /* 深藍灰色，與圖片一致 */
+  background-color: #2c3e50;
   color: white;
 }
 
@@ -238,6 +296,7 @@ main.login-wrapper {
   left: 0;
   right: 0;
   height: 1px;
+  background-color: #ddd;
 }
 
 .divider span {
@@ -272,29 +331,30 @@ main.login-wrapper {
   min-height: 20px;
 }
 
-.google-btn:hover {
-  border-color: #db4437;
-  background-color: #fdf2f2;
-}
-
-.facebook-btn:hover {
-  border-color: #4267B2;
-  background-color: #f0f4ff;
-}
-
-.social-btn:hover {
-  transform: translateY(-2px);
-}
-
 /* 大螢幕版型 (1400px以上) */
 @media (min-width: 1400px) {
+  main.login-wrapper {
+    padding: 40px 60px;
+  }
+
   .login-container {
     border-radius: 25px;
     padding: 40px 50px;
+    max-width: 500px;
   }
 
   .login-header {
     margin-bottom: 35px;
+  }
+
+  .back-btn {
+    padding: 8px;
+    margin-right: 15px;
+  }
+
+  .back-btn img {
+    width: 20px;
+    height: 20px;
   }
 
   .login-header h2 {
@@ -311,22 +371,51 @@ main.login-wrapper {
   }
 
   .form-group label {
-    font-size: 16px;
+    font-size: 18px;
+    margin-bottom: 8px;
   }
 
   .form-group input {
-    font-size: 14px;
+    font-size: 16px; /* 從 14px 增大到 16px */
     padding: 15px;
+    padding-right: 45px;
     border-radius: 10px;
+  }
+
+  .toggle-password {
+    right: 12px;
+    padding: 0;
+    outline: none;
+    border: none;
+  }
+
+  .toggle-password:focus {
+    outline: none;
+    box-shadow: none;
   }
 
   .toggle-password img {
     width: 16px;
     height: 16px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .toggle-password:hover img,
+  .toggle-password:focus img,
+  .toggle-password:active img {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .form-options {
+    margin: 8px 0;
   }
 
   .remember-me {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .checkmark {
@@ -337,7 +426,7 @@ main.login-wrapper {
   }
 
   .forgot-password {
-    font-size: 14px;
+    font-size: 16px;
   }
 
   .login-btn,
@@ -380,11 +469,16 @@ main.login-wrapper {
   .login-container {
     border-radius: 3vw;
     padding: 4vw 5vw;
-    max-width: 500px;
+    max-width: 550px;
   }
 
   .login-header {
     margin-bottom: 4vw;
+  }
+
+  .back-btn {
+    padding: 1vw;
+    margin-right: 1.5vw;
   }
 
   .back-btn img {
@@ -406,22 +500,51 @@ main.login-wrapper {
   }
 
   .form-group label {
-    font-size: 1.8vw;
+    font-size: 2.2vw;
+    margin-bottom: 1vw;
   }
 
   .form-group input {
-    font-size: 1.6vw;
+    font-size: 2vw; /* 從 1.6vw 增大到 2vw */
     padding: 2vw;
+    padding-right: 4.5vw;
     border-radius: 1.5vw;
+  }
+
+  .toggle-password {
+    right: 1.2vw;
+    padding: 0;
+    outline: none;
+    border: none;
+  }
+
+  .toggle-password:focus {
+    outline: none;
+    box-shadow: none;
   }
 
   .toggle-password img {
     width: 2vw;
     height: 2vw;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .toggle-password:hover img,
+  .toggle-password:focus img,
+  .toggle-password:active img {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .form-options {
+    margin: 1vw 0;
   }
 
   .remember-me {
-    font-size: 1.5vw;
+    font-size: 1.8vw;
   }
 
   .checkmark {
@@ -432,7 +555,7 @@ main.login-wrapper {
   }
 
   .forgot-password {
-    font-size: 1.5vw;
+    font-size: 1.8vw;
   }
 
   .login-btn,
@@ -470,12 +593,14 @@ main.login-wrapper {
 @media (max-width: 768px) {
   main.login-wrapper {
     padding: 20px;
+    min-height: calc(100vh - 140px);
   }
 
   .login-container {
     border-radius: 20px;
     padding: 30px 25px;
     max-width: 100%;
+    width: 100%;
   }
 
   .login-header {
@@ -498,62 +623,106 @@ main.login-wrapper {
   }
 
   .login-form {
-    gap: 20px;
+    gap: 24px;
   }
 
   .form-group {
-    gap: 8px;
+    gap: 10px;
   }
 
   .form-group label {
-    font-size: 16px;
+    font-size: 18px;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: #333;
+    line-height: 1.4;
   }
 
   .form-group input {
-    font-size: 16px;
-    padding: 15px;
+    font-size: 14px !important; /* 從 16px 增大到 18px */
+    padding: 16px;
+    padding-right: 50px;
     border-radius: 12px;
+    border: 2px solid #ddd;
+    line-height: 1.4;
+    min-height: 48px;
+    box-sizing: border-box;
+  }
+
+  .form-group input:focus {
+    border-color: #ffb84d;
   }
 
   .toggle-password {
-    right: 15px;
-    padding: 5px;
+    right: 12px;
+    padding: 0;
+    outline: none;
+    border: none;
+  }
+
+  .toggle-password:focus {
+    outline: none;
+    box-shadow: none;
   }
 
   .toggle-password img {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .toggle-password:hover img,
+  .toggle-password:focus img,
+  .toggle-password:active img {
+    border: none;
+    outline: none;
+    box-shadow: none;
   }
 
   .form-options {
-    margin: 8px 0;
+    margin: 12px 0;
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
   }
 
   .remember-me {
-    font-size: 14px;
+    font-size: 16px;
+    align-self: flex-start;
+    padding: 5px 0;
   }
 
   .checkmark {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
     border-radius: 4px;
-    margin-right: 8px;
+    margin-right: 10px;
+    border-width: 2px;
   }
 
   .forgot-password {
-    font-size: 14px;
+    font-size: 16px;
+    align-self: flex-end;
+    padding: 5px 0;
+    min-height: 28px;
+    display: flex;
+    align-items: center;
   }
 
   .login-btn,
   .register-btn {
     font-size: 16px;
-    padding: 15px;
+    font-weight: 600;
+    padding: 16px;
     border-radius: 25px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
+    min-height: 50px;
   }
 
   .divider {
-    margin: 20px 0;
+    margin: 24px 0;
   }
 
   .divider span {
@@ -562,15 +731,141 @@ main.login-wrapper {
   }
 
   .social-btn {
-    font-size: 14px;
-    padding: 15px;
+    font-size: 15px;
+    padding: 16px;
     border-radius: 25px;
-    margin-bottom: 12px;
+    margin-bottom: 15px;
     gap: 12px;
+    min-height: 50px;
   }
 
   .social-btn img {
     width: 20px;
     height: 20px;
+  }
+}
+
+/* 小手機版型 (小於480px) */
+@media (max-width: 480px) {
+  main.login-wrapper {
+    padding: 15px;
+  }
+
+  .login-container {
+    padding: 25px 20px;
+    border-radius: 15px;
+  }
+
+  .login-header h2 {
+    font-size: 22px;
+    margin-right: 30px;
+  }
+
+  .login-form {
+    gap: 20px;
+  }
+
+  .form-group {
+    gap: 8px;
+  }
+
+  .form-group label {
+    font-size: 17px;
+    margin-bottom: 8px;
+  }
+
+  .form-group input {
+    padding: 14px;
+    padding-right: 48px;
+    font-size: 12px !important;
+    min-height: 46px;
+  }
+
+  .toggle-password {
+    right: 10px;
+    padding: 0;
+    outline: none;
+    border: none;
+  }
+
+  .toggle-password:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  .toggle-password img {
+    width: 16px;
+    height: 16px;
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .toggle-password:hover img,
+  .toggle-password:focus img,
+  .toggle-password:active img {
+    border: none;
+    outline: none;
+    box-shadow: none;
+  }
+
+  .form-options {
+    gap: 12px;
+  }
+
+  .remember-me,
+  .forgot-password {
+    font-size: 15px;
+  }
+
+  .checkmark {
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+  }
+
+  .login-btn,
+  .register-btn,
+  .social-btn {
+    padding: 14px;
+    font-size: 15px;
+    min-height: 48px;
+  }
+}
+
+/* 無障礙和互動改進 */
+.form-group input:focus,
+.login-btn:focus,
+.register-btn:focus,
+.social-btn:focus {
+  outline: 2px solid #ffb84d;
+  outline-offset: 2px;
+}
+
+/* 特別針對 toggle-password 移除 focus 樣式 */
+.toggle-password:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+/* 高解析度螢幕優化 */
+@media (min-resolution: 2dppx) {
+  .toggle-password img,
+  .social-btn img,
+  .back-btn img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* 減少動畫的使用者偏好 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
