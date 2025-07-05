@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>常見問題 - 芝山圓夢媒合站</title>
+    <link rel="icon" href="img/favicon.png" type="image/x-icon">
+    <script src="header-component.js" defer></script>
+    <script src="footer-component.js" defer></script>
+    <link rel="stylesheet" href="css/questions.css" />
+</head>
+<body>
+    <header-component></header-component>
+
+    <main class="questions-section">
+        <div class="questions-container">
+            <!-- 返回按鈕 -->
+            <div class="back-navigation">
+                <button class="back-btn" onclick="history.back()">
+                    <img src="img/right-arrow.png" alt="返回" />
+                    返回上一頁
+                </button>
+            </div>
+
+            <!-- 開發中狀態卡片 -->
+            <div class="development-card">
+                <div class="development-content">
+                    <div class="development-icon">
+                        <img src="img/fixing.png" alt="開發中" onerror="this.style.display='none'">
+                    </div>
+                    <div class="development-info">
+                        <h2 class="development-title">頁面開發中</h2>
+                        <p class="development-description">
+                            我們正在努力為您準備詳細的常見問題解答。<br>
+                            此頁面將包含有關平台使用、提案流程、合作方式等重要資訊。
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer-component></footer-component>
+</body>
+</html>

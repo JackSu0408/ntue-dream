@@ -1,6 +1,5 @@
 class HeaderComponent extends HTMLElement {
     connectedCallback() {
-        // 檢查登入狀態
         const savedUser = localStorage.getItem('ntueDreamUser');
         const isLoggedIn = savedUser !== null;
         const userData = isLoggedIn ? JSON.parse(savedUser) : null;
@@ -16,6 +15,8 @@ class HeaderComponent extends HTMLElement {
           padding: 0 3%;
           background-color: #f5f5dc;
           box-sizing: border-box;
+          position: relative;
+          z-index: 1000;
         }
         .logo-section {
           display: flex;
@@ -114,7 +115,6 @@ class HeaderComponent extends HTMLElement {
           background-color: white;
           border: 1px solid #ddd;
           border-radius: 0.5vw;
-          box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
           min-width: 8vw;
           display: none;
           z-index: 1000;
@@ -136,9 +136,204 @@ class HeaderComponent extends HTMLElement {
         .dropdown-item:hover {
           background-color: #f5f5f5;
         }
+
+        /* 漢堡選單樣式 */
+        .hamburger-menu {
+          display: none;
+          flex-direction: column;
+          cursor: pointer;
+          padding: 5px;
+          z-index: 1001;
+        }
+        
+        .hamburger-line {
+          width: 25px;
+          height: 3px;
+          background-color: #333;
+          margin: 3px 0;
+          transition: all 0.3s ease;
+          border-radius: 2px;
+        }
+        
+        /* 漢堡選單變成叉叉的動畫 */
+        .hamburger-menu.active .hamburger-line:nth-child(1) {
+          transform: rotate(45deg) translate(7px, 7px);
+        }
+        
+        .hamburger-menu.active .hamburger-line:nth-child(2) {
+          opacity: 0;
+          transform: scale(0);
+        }
+        
+        .hamburger-menu.active .hamburger-line:nth-child(3) {
+          transform: rotate(-45deg) translate(5.5px, -5.5px);
+        }
+
+        /* 移動端選單下拉覆蓋層 */
+        .mobile-menu {
+          display: none;
+          position: fixed;
+          top: 70px;
+          right: 0;
+          width: 280px;
+          max-width: 90vw;
+          background-color: #ffffff;
+          border: 1px solid #ddd;
+          border-radius: 0 0 8px 8px;
+          flex-direction: column;
+          opacity: 0;
+          transform: translateY(-10px);
+          transition: all 0.3s ease;
+          z-index: 999;
+        }
+
+        .mobile-menu.active {
+          display: flex;
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .mobile-menu-content {
+          display: flex;
+          flex-direction: column;
+          padding: 0;
+        }
+
+        /* 移動端用戶資訊 */
+        .mobile-user-section {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          padding: 15px 20px;
+          border-bottom: 1px solid #eee;
+          background-color: #f8f9fa;
+        }
+
+        .mobile-profile-icon img {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          object-fit: cover;
+          border: 2px solid #ffb84d;
+        }
+
+        .mobile-user-info {
+          flex: 1;
+        }
+
+        .mobile-user-name {
+          font-size: 14px;
+          font-weight: bold;
+          color: #333;
+          margin: 0 0 2px 0;
+        }
+
+        .mobile-user-type {
+          font-size: 12px;
+          color: #666;
+          margin: 0;
+        }
+
+        /* 移動端導航選單 */
+        .mobile-nav-menu {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .mobile-nav-menu a {
+          color: #333;
+          text-decoration: none;
+          font-size: 15px;
+          font-weight: 500;
+          padding: 12px 20px;
+          transition: all 0.3s ease;
+          border-bottom: 1px solid #eee;
+        }
+
+        .mobile-nav-menu a:last-child {
+          border-bottom: none;
+        }
+
+        .mobile-nav-menu a:hover {
+          background-color: #f8f9fa;
+          color: #ffb84d;
+        }
+
+        /* 移動端用戶操作選單 */
+        .mobile-user-actions {
+          display: flex;
+          flex-direction: column;
+          padding: 15px 20px;
+          gap: 8px;
+          background-color: #f8f9fa;
+        }
+
+        .mobile-action-btn {
+          background: none;
+          border: 1px solid #ffb84d;
+          color: #ffb84d;
+          padding: 8px 16px;
+          border-radius: 15px;
+          font-size: 13px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: inherit;
+          text-align: center;
+        }
+
+        .mobile-action-btn:hover {
+          background-color: #ffb84d;
+          color: white;
+        }
+
+        .mobile-action-btn.logout {
+          border-color: #dc3545;
+          color: #dc3545;
+        }
+
+        .mobile-action-btn.logout:hover {
+          background-color: #dc3545;
+          color: white;
+        }
         
         /* 響應式設計 */
+        @media (min-width: 1025px) {
+          .mobile-menu {
+            display: none !important;
+          }
+          .hamburger-menu {
+            display: none !important;
+          }
+        }
+
         @media (min-width: 1400px) {
+          .header {
+            height: 80px;
+            padding: 0 60px;
+          }
+          .logo-icon {
+            width: 35px;
+            height: 35px;
+          }
+          .logo-text .main-title {
+            font-size: 22px;
+          }
+          .logo-text .subtitle {
+            font-size: 12px;
+          }
+          .nav-menu {
+            gap: 30px;
+          }
+          .nav-menu a {
+            font-size: 16px;
+          }
+          .user-info {
+            font-size: 13px;
+          }
+          .user-type {
+            font-size: 10px;
+          }
           .profile-icon img,
           .guest-profile-icon img {
             width: 40px;
@@ -149,44 +344,187 @@ class HeaderComponent extends HTMLElement {
             min-width: 120px;
           }
           .dropdown-item {
-            padding: 12px 15px;
+            padding: 12px 16px;
             font-size: 14px;
           }
         }
         
         @media (max-width: 1024px) and (min-width: 769px) {
+          .header {
+            height: 12vw;
+            padding: 0 4%;
+          }
+          .logo-icon {
+            width: 3.5vw;
+            height: 3.5vw;
+          }
+          .logo-text .main-title {
+            font-size: 2.2vw;
+          }
+          .logo-text .subtitle {
+            font-size: 1.1vw;
+          }
+          .nav-menu {
+            gap: 3vw;
+          }
+          .nav-menu a {
+            font-size: 1.6vw;
+          }
+          .user-info {
+            font-size: 1.3vw;
+          }
+          .user-type {
+            font-size: 1vw;
+          }
           .profile-icon img,
           .guest-profile-icon img {
             width: 4vw;
             height: 4vw;
           }
-          .user-dropdown {
-            border-radius: 1vw;
-            min-width: 12vw;
-          }
-          .dropdown-item {
-            padding: 1.5vw 2vw;
-            font-size: 1.4vw;
+          
+          /* 平板版選單定位 */
+          .mobile-menu {
+            width: 320px;
+            max-width: 85vw;
+            right: 4%;
           }
         }
         
         @media (max-width: 768px) {
+          .header {
+            height: 70px;
+            padding: 0 20px;
+          }
+          .logo-section {
+            gap: 10px;
+          }
+          .logo-icon {
+            width: 30px;
+            height: 30px;
+          }
+          .logo-text .main-title {
+            font-size: 18px;
+          }
+          .logo-text .subtitle {
+            font-size: 10px;
+          }
+          .nav-menu {
+            display: none;
+          }
+          .user-section {
+            display: none;
+          }
+          .hamburger-menu {
+            display: flex;
+          }
+          
+          /* 手機版選單定位 */
+          .mobile-menu {
+            width: 260px;
+            max-width: 85vw;
+            right: 20px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .mobile-menu {
+            width: 240px;
+            max-width: 80vw;
+            right: 20px;
+          }
+        }
+        
+        @media (max-width: 1024px) and (min-width: 769px) {
+          .header {
+            height: 12vw;
+            padding: 0 4%;
+          }
+          .logo-icon {
+            width: 3.5vw;
+            height: 3.5vw;
+          }
+          .logo-text .main-title {
+            font-size: 2.2vw;
+          }
+          .logo-text .subtitle {
+            font-size: 1.1vw;
+          }
+          .nav-menu {
+            gap: 3vw;
+          }
+          .nav-menu a {
+            font-size: 1.6vw;
+          }
+          .user-info {
+            font-size: 1.3vw;
+          }
+          .user-type {
+            font-size: 1vw;
+          }
+          .profile-icon img,
+          .guest-profile-icon img {
+            width: 4vw;
+            height: 4vw;
+          }
+          
+          /* 平板版選單定位 */
+          .mobile-menu {
+            width: 320px;
+            max-width: 85vw;
+            right: 4%;
+          }
+        }
+        
+        @media (max-width: 768px) {
+          .header {
+            height: 70px;
+            padding: 0 20px;
+          }
+          .logo-section {
+            gap: 10px;
+          }
+          .logo-icon {
+            width: 30px;
+            height: 30px;
+          }
+          .logo-text .main-title {
+            font-size: 18px;
+          }
+          .logo-text .subtitle {
+            font-size: 10px;
+          }
+          .nav-menu {
+            display: none;
+          }
+          .user-section {
+            display: none;
+          }
+          .hamburger-menu {
+            display: flex;
+          }
           .profile-icon img,
           .guest-profile-icon img {
             width: 40px;
             height: 40px;
           }
           .user-dropdown {
-            border-radius: 12px;
-            min-width: 140px;
+            border-radius: 8px;
+            min-width: 120px;
           }
           .dropdown-item {
-            padding: 15px 20px;
-            font-size: 16px;
+            padding: 12px 16px;
+            font-size: 14px;
+          }
+          
+          /* 手機版選單定位 */
+          .mobile-menu {
+            width: 260px;
+            max-width: 85vw;
+            right: 20px;
           }
         }
       </style>
-
+      
       <div class="header">
         <div class="logo-section">
           <img src="img/ntueDream-logo.png" alt="Logo" class="logo-icon" />
@@ -199,7 +537,7 @@ class HeaderComponent extends HTMLElement {
           <a href="index.html">首頁</a>
           <a href="proposal.html">夢想聚合</a>
           <a href="overview.html">提案總覽</a>
-          <a href="#">常見問題</a>
+          <a href="questions.html">常見問題</a>
           <a href="#" onclick="scrollToFooter(); return false;">聯絡我們</a>
         </nav>
         <div class="user-section">
@@ -225,6 +563,61 @@ class HeaderComponent extends HTMLElement {
             </div>
           `}
         </div>
+        
+        <!-- 漢堡選單按鈕 -->
+        <div class="hamburger-menu" onclick="toggleMobileMenu()">
+          <div class="hamburger-line"></div>
+          <div class="hamburger-line"></div>
+          <div class="hamburger-line"></div>
+        </div>
+      </div>
+
+      <!-- 移動端選單下拉區域 -->
+      <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-content">
+          <!-- 用戶資訊區域 -->
+          ${isLoggedIn ? `
+            <div class="mobile-user-section">
+              <div class="mobile-profile-icon">
+                <img src="img/user.png" alt="User" />
+              </div>
+              <div class="mobile-user-info">
+                <p class="mobile-user-name">${userData.name}</p>
+                <p class="mobile-user-type">會員</p>
+              </div>
+            </div>
+          ` : `
+            <div class="mobile-user-section">
+              <div class="mobile-profile-icon">
+                <img src="img/user.png" alt="Guest User" style="opacity: 0.7; border-color: #ddd;" />
+              </div>
+              <div class="mobile-user-info">
+                <p class="mobile-user-name">訪客</p>
+                <p class="mobile-user-type">未登入</p>
+              </div>
+            </div>
+          `}
+
+          <!-- 導航選單 -->
+          <nav class="mobile-nav-menu">
+            <a href="index.html" onclick="closeMobileMenu()">首頁</a>
+            <a href="proposal.html" onclick="closeMobileMenu()">夢想聚合</a>
+            <a href="overview.html" onclick="closeMobileMenu()">提案總覽</a>
+            <a href="questions.html" onclick="closeMobileMenu()">常見問題</a>
+            <a href="#" onclick="scrollToFooterMobile(); return false;">聯絡我們</a>
+          </nav>
+
+          <!-- 用戶操作選單 -->
+          <div class="mobile-user-actions">
+            ${isLoggedIn ? `
+              <button class="mobile-action-btn" onclick="viewProfile()">個人資料</button>
+              <button class="mobile-action-btn" onclick="viewMyProposals()">我的提案</button>
+              <button class="mobile-action-btn logout" onclick="logoutUser()">登出</button>
+            ` : `
+              <button class="mobile-action-btn" onclick="goToLogin()">登入</button>
+            `}
+          </div>
+        </div>
       </div>
     `;
 
@@ -237,6 +630,33 @@ class HeaderComponent extends HTMLElement {
                     block: 'start'
                 });
             }
+        };
+
+        // 移動端滾動到 footer
+        window.scrollToFooterMobile = function() {
+            closeMobileMenu();
+            setTimeout(() => {
+                scrollToFooter();
+            }, 100);
+        };
+
+        // 漢堡選單功能
+        window.toggleMobileMenu = function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger-menu');
+            
+            mobileMenu.classList.toggle('active');
+            hamburger.classList.toggle('active');
+            
+            // 下拉選單不需要鎖定背景滾動
+        };
+
+        window.closeMobileMenu = function() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const hamburger = document.querySelector('.hamburger-menu');
+            
+            mobileMenu.classList.remove('active');
+            hamburger.classList.remove('active');
         };
 
         // 已登入用戶下拉選單功能
@@ -267,44 +687,66 @@ class HeaderComponent extends HTMLElement {
         document.addEventListener('click', function(event) {
             const userDropdown = document.getElementById('userDropdown');
             const guestDropdown = document.getElementById('guestDropdown');
+            const mobileMenu = document.getElementById('mobileMenu');
             const profileIcon = document.querySelector('.profile-icon');
             const guestProfileIcon = document.querySelector('.guest-profile-icon');
+            const hamburgerMenu = document.querySelector('.hamburger-menu');
             
             // 檢查是否點擊在頭像或下拉選單之外
             const clickedOutside = (
                 (!profileIcon || !profileIcon.contains(event.target)) &&
-                (!guestProfileIcon || !guestProfileIcon.contains(event.target))
+                (!guestProfileIcon || !guestProfileIcon.contains(event.target)) &&
+                (!hamburgerMenu || !hamburgerMenu.contains(event.target)) &&
+                (!mobileMenu || !mobileMenu.contains(event.target))
             );
             
             if (clickedOutside) {
                 if (userDropdown) userDropdown.classList.remove('show');
                 if (guestDropdown) guestDropdown.classList.remove('show');
+                closeMobileMenu();
             }
         });
 
         // 已登入用戶功能函數
         window.viewProfile = function() {
             alert('個人資料功能開發中...');
-            document.getElementById('userDropdown').classList.remove('show');
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) userDropdown.classList.remove('show');
+            closeMobileMenu();
         };
 
         window.viewMyProposals = function() {
             alert('我的提案功能開發中...');
-            document.getElementById('userDropdown').classList.remove('show');
+            const userDropdown = document.getElementById('userDropdown');
+            if (userDropdown) userDropdown.classList.remove('show');
+            closeMobileMenu();
         };
 
         window.logoutUser = function() {
             if (confirm('確定要登出嗎？')) {
                 localStorage.removeItem('ntueDreamUser');
                 localStorage.removeItem('ntueDreamUserExpire');
+                closeMobileMenu();
                 window.location.reload();
             }
         };
 
         // 未登入用戶功能函數
         window.goToLogin = function() {
+            closeMobileMenu();
             window.location.href = 'login.html';
         };
+
+        // ESC 鍵關閉選單
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeMobileMenu();
+                const userDropdown = document.getElementById('userDropdown');
+                const guestDropdown = document.getElementById('guestDropdown');
+                if (userDropdown) userDropdown.classList.remove('show');
+                if (guestDropdown) guestDropdown.classList.remove('show');
+            }
+        });
     }
 }
 
