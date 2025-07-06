@@ -1,8 +1,27 @@
 class HeaderComponent extends HTMLElement {
     connectedCallback() {
+        // 檢查新的登入狀態格式
+        const isLoggedInNew = localStorage.getItem('userLoggedIn') === 'true';
+        const userInfoNew = localStorage.getItem('userInfo');
+        
+        // 檢查舊的登入狀態格式（向下相容）
         const savedUser = localStorage.getItem('ntueDreamUser');
-        const isLoggedIn = savedUser !== null;
-        const userData = isLoggedIn ? JSON.parse(savedUser) : null;
+        
+        let isLoggedIn = false;
+        let userData = null;
+        
+        if (isLoggedInNew && userInfoNew) {
+            // 使用新格式
+            isLoggedIn = true;
+            userData = JSON.parse(userInfoNew);
+        } else if (savedUser) {
+            // 使用舊格式並轉換為新格式
+            isLoggedIn = true;
+            userData = JSON.parse(savedUser);
+            // 轉換為新格式
+            localStorage.setItem('userLoggedIn', 'true');
+            localStorage.setItem('userInfo', JSON.stringify(userData));
+        }
 
         this.innerHTML = `
       <style>
@@ -724,8 +743,12 @@ class HeaderComponent extends HTMLElement {
 
         window.logoutUser = function() {
             if (confirm('確定要登出嗎？')) {
+                // 清除所有登入相關的資料
+                localStorage.removeItem('userLoggedIn');
+                localStorage.removeItem('userInfo');
                 localStorage.removeItem('ntueDreamUser');
                 localStorage.removeItem('ntueDreamUserExpire');
+                localStorage.removeItem('redirectAfterLogin');
                 closeMobileMenu();
                 window.location.reload();
             }

@@ -200,9 +200,19 @@
 
                     alert(`歡迎回來，${result.userData.name}！`);
                     
-                    // 導向首頁或用戶原本要去的頁面
-                    const redirectUrl = sessionStorage.getItem('redirectAfterLogin') || 'index.html';
+                    // 設定登入狀態（新的統一格式）
+                    localStorage.setItem('userLoggedIn', 'true');
+                    localStorage.setItem('userInfo', JSON.stringify(result.userData));
+                    
+                    // 檢查是否有重定向URL
+                    const redirectUrl = localStorage.getItem('redirectAfterLogin') || 
+                                      sessionStorage.getItem('redirectAfterLogin') || 
+                                      'index.html';
+                    
+                    // 清除重定向URL
+                    localStorage.removeItem('redirectAfterLogin');
                     sessionStorage.removeItem('redirectAfterLogin');
+                    
                     window.location.href = redirectUrl;
 
                 } else {
@@ -222,6 +232,26 @@
 
         // 頁面載入時檢查是否已登入
         document.addEventListener('DOMContentLoaded', function() {
+            // 檢查新的登入狀態格式
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userInfo = localStorage.getItem('userInfo');
+            
+            if (isLoggedIn && userInfo) {
+                // 如果已登入，詢問是否要直接進入
+                const userData = JSON.parse(userInfo);
+                if (confirm(`您已經登入了，是否要繼續使用 ${userData.name} 的帳號？`)) {
+                    window.location.href = 'index.html';
+                } else {
+                    // 清除登入狀態
+                    localStorage.removeItem('userLoggedIn');
+                    localStorage.removeItem('userInfo');
+                    localStorage.removeItem('ntueDreamUser');
+                    localStorage.removeItem('ntueDreamUserExpire');
+                }
+                return;
+            }
+            
+            // 檢查舊的登入狀態格式（向下相容）
             const savedUser = localStorage.getItem('ntueDreamUser');
             const userExpire = localStorage.getItem('ntueDreamUserExpire');
             
@@ -237,10 +267,14 @@
                     }
                 }
                 
-                // 如果已登入，詢問是否要直接進入
+                // 轉換為新格式
                 const userData = JSON.parse(savedUser);
-                confirm(`您已經登入了`)
-                window.location.href = 'index.html';
+                localStorage.setItem('userLoggedIn', 'true');
+                localStorage.setItem('userInfo', JSON.stringify(userData));
+                
+                if (confirm(`您已經登入了，是否要繼續使用 ${userData.name} 的帳號？`)) {
+                    window.location.href = 'index.html';
+                }
             }
         });
     </script>

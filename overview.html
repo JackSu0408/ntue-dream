@@ -63,6 +63,11 @@
             const cardClass = isCompany ? 'proposal-card company' : 'proposal-card student';
             const iconSrc = isCompany ? 'img/office.png' : 'img/student.png';
             
+            // 檢查登入狀態來決定按鈕文字和樣式
+            const isUserLoggedIn = checkLoginStatus();
+            const buttonText = isUserLoggedIn ? '查看詳情' : '登入查看';
+            const buttonClass = isUserLoggedIn ? 'contact-btn' : 'contact-btn login-required';
+            
             // 從 Firebase 資料中取得標題
             let displayTitle = '';
             let displayAuthor = '';
@@ -161,7 +166,7 @@
                     
                     <div class="card-price">
                         <p class="price-text">${budget}</p>
-                        <button class="contact-btn" onclick="viewProposalDetails('${proposal.id}')">查看詳情</button>
+                        <button class="${buttonClass}" onclick="viewProposalDetails('${proposal.id}')">${buttonText}</button>
                     </div>
                 </div>
             `;
@@ -194,9 +199,29 @@
             }
         }
 
+        // 檢查登入狀態的函數
+        function checkLoginStatus() {
+            // 檢查 localStorage 中是否有登入資訊
+            const isLoggedIn = localStorage.getItem('userLoggedIn') === 'true';
+            const userInfo = localStorage.getItem('userInfo');
+            
+            return isLoggedIn && userInfo;
+        }
+
         // 查看提案詳情的函數
         window.viewProposalDetails = function(proposalId) {
-            // 導向提案詳情頁面
+            // 檢查是否已登入
+            if (!checkLoginStatus()) {
+                // 未登入，顯示提示並導向登入頁面
+                if (confirm('您需要登入後才能查看提案詳情。\n\n是否要前往登入頁面？')) {
+                    // 儲存當前要查看的提案ID，登入後可以回到此頁面
+                    localStorage.setItem('redirectAfterLogin', `proposal-detail.html?id=${proposalId}`);
+                    window.location.href = 'login.html';
+                }
+                return;
+            }
+            
+            // 已登入，導向提案詳情頁面
             window.location.href = `proposal-detail.html?id=${proposalId}`;
         }
 

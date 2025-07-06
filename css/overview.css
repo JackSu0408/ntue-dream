@@ -167,6 +167,18 @@ main.overview-section {
     transform: translateY(-2px);
 }
 
+/* 需要登入的按鈕樣式 */
+.contact-btn.login-required {
+    background-color: #6c757d;
+    color: white;
+    position: relative;
+}
+
+.contact-btn.login-required:hover {
+    background-color: #5a6268;
+    transform: translateY(-2px);
+}
+
 /* 載入更多按鈕 */
 .load-more-container {
     text-align: center;
@@ -268,6 +280,14 @@ main.overview-section {
         border-radius: 20px;
     }
 
+    .contact-btn.login-required {
+        background-color: #6c757d;
+    }
+
+    .contact-btn.login-required:hover {
+        background-color: #5a6268;
+    }
+
     .no-proposals,
     .error-message,
     .loading-message {
@@ -337,6 +357,14 @@ main.overview-section {
     .contact-btn {
         font-size: 1.3vw;
         padding: 1.2vw 2.5vw;
+    }
+
+    .contact-btn.login-required {
+        background-color: #6c757d;
+    }
+
+    .contact-btn.login-required:hover {
+        background-color: #5a6268;
     }
 
     .load-more-btn {
@@ -410,6 +438,14 @@ main.overview-section {
         font-size: 14px;
         padding: 12px 25px;
         border-radius: 25px;
+    }
+
+    .contact-btn.login-required {
+        background-color: #6c757d;
+    }
+
+    .contact-btn.login-required:hover {
+        background-color: #5a6268;
     }
 
     .load-more-btn {

@@ -255,33 +255,6 @@ main.detail-section {
     height: 1.2vw;
 }
 
-/* 作者資訊 */
-.author-section {
-    background-color: #f8f9fa;
-    padding: 2vw;
-    border-radius: 1vw;
-    margin-bottom: 3vw;
-}
-
-.author-info {
-    display: flex;
-    flex-direction: column;
-    gap: 1vw;
-}
-
-.author-detail {
-    font-size: 1.1vw;
-}
-
-.author-label {
-    font-weight: 600;
-    color: #666;
-}
-
-.author-value {
-    color: #333;
-}
-
 /* 操作區域 */
 .action-section {
     display: flex;
@@ -307,6 +280,17 @@ main.detail-section {
 .contact-btn:hover {
     background-color: #ff9f26;
     transform: translateY(-2px);
+}
+
+.contact-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.contact-btn:disabled:hover {
+    background-color: #ccc;
+    transform: none;
 }
 
 .back-btn-secondary {
@@ -482,20 +466,6 @@ main.detail-section {
         height: 18px;
     }
 
-    .author-section {
-        padding: 30px;
-        border-radius: 15px;
-        margin-bottom: 40px;
-    }
-
-    .author-info {
-        gap: 15px;
-    }
-
-    .author-detail {
-        font-size: 16px;
-    }
-
     .action-section {
         gap: 30px;
         padding-top: 30px;
@@ -658,20 +628,6 @@ main.detail-section {
     .link-icon {
         width: 2vw;
         height: 2vw;
-    }
-
-    .author-section {
-        padding: 3vw;
-        border-radius: 1.5vw;
-        margin-bottom: 5vw;
-    }
-
-    .author-info {
-        gap: 2vw;
-    }
-
-    .author-detail {
-        font-size: 1.6vw;
     }
 
     .action-section {
@@ -838,20 +794,6 @@ main.detail-section {
     .link-icon {
         width: 16px;
         height: 16px;
-    }
-
-    .author-section {
-        padding: 20px;
-        border-radius: 12px;
-        margin-bottom: 30px;
-    }
-
-    .author-info {
-        gap: 12px;
-    }
-
-    .author-detail {
-        font-size: 14px;
     }
 
     .action-section {

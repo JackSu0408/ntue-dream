@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EmailJS 測試頁面</title>
+    <style>
+        body {
+            font-family: "Noto Sans TC", sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5dc;
+        }
+        
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        
+        button {
+            background-color: #ffb84d;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        button:hover {
+            background-color: #ff9f26;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            color: #0c5460;
+            margin-bottom: 20px;
+        }
+    </style>
+    <!-- EmailJS CDN -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+</head>
+<body>
+    <div class="test-container">
+        <h1>EmailJS 功能測試</h1>
+        
+        <div class="info">
+            <h3>使用說明：</h3>
+            <ol>
+                <li>請先在下方填入您的 EmailJS 設定參數</li>
+                <li>點擊「測試發送」按鈕</li>
+                <li>檢查管理員信箱是否收到測試郵件</li>
+            </ol>
+        </div>
+        
+        <div class="form-group">
+            <label for="serviceId">Service ID:</label>
+            <input type="text" id="serviceId" placeholder="請輸入您的 EmailJS Service ID">
+        </div>
+        
+        <div class="form-group">
+            <label for="templateId">Template ID:</label>
+            <input type="text" id="templateId" placeholder="請輸入您的 EmailJS Template ID">
+        </div>
+        
+        <div class="form-group">
+            <label for="publicKey">Public Key:</label>
+            <input type="text" id="publicKey" placeholder="請輸入您的 EmailJS Public Key">
+        </div>
+        
+        <button onclick="testEmailJS()" id="testBtn">測試發送</button>
+        
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        async function testEmailJS() {
+            const serviceId = document.getElementById('serviceId').value.trim();
+            const templateId = document.getElementById('templateId').value.trim();
+            const publicKey = document.getElementById('publicKey').value.trim();
+            const resultDiv = document.getElementById('result');
+            const testBtn = document.getElementById('testBtn');
+            
+            // 隱藏之前的結果
+            resultDiv.style.display = 'none';
+            
+            // 驗證輸入
+            if (!serviceId || !templateId || !publicKey) {
+                showResult('請填入所有必要的 EmailJS 參數', 'error');
+                return;
+            }
+            
+            // 顯示載入狀態
+            testBtn.textContent = '發送中...';
+            testBtn.disabled = true;
+            
+            try {
+                // 初始化 EmailJS
+                emailjs.init(publicKey);
+                
+                // 準備測試資料
+                const templateParams = {
+                    to_email: 'su20050408@gmail.com',
+                    from_name: '測試使用者',
+                    user_email: 'test@example.com',
+                    user_name: '測試姓名',
+                    user_type: '測試類型',
+                    proposal_url: 'http://test-website.com/proposal-detail.html?id=test123',
+                    proposal_id: 'test123',
+                    proposal_title: '測試提案標題',
+                    proposal_type: '測試提案類型',
+                    author_email: 'author@example.com',
+                    author_name: '測試發布者',
+                    send_time: new Date().toLocaleString('zh-TW')
+                };
+                
+                // 發送測試郵件
+                const response = await emailjs.send(serviceId, templateId, templateParams);
+                
+                console.log('測試郵件發送成功:', response);
+                showResult('✅ 測試郵件發送成功！請檢查管理員信箱 (su20050408@gmail.com)', 'success');
+                
+            } catch (error) {
+                console.error('測試郵件發送失敗:', error);
+                showResult(`❌ 測試郵件發送失敗：${error.text || error.message || '未知錯誤'}`, 'error');
+            } finally {
+                // 恢復按鈕狀態
+                testBtn.textContent = '測試發送';
+                testBtn.disabled = false;
+            }
+        }
+        
+        function showResult(message, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = message;
+            resultDiv.className = `result ${type}`;
+            resultDiv.style.display = 'block';
+        }
+        
+        // 從 localStorage 載入之前保存的設定
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedServiceId = localStorage.getItem('emailjs_test_service_id') || 'service_7yl7dx7';
+            const savedTemplateId = localStorage.getItem('emailjs_test_template_id') || 'template_k4gqytq';
+            const savedPublicKey = localStorage.getItem('emailjs_test_public_key') || 'DeR21EWdHC6cyzXR0';
+            
+            document.getElementById('serviceId').value = savedServiceId;
+            document.getElementById('templateId').value = savedTemplateId;
+            document.getElementById('publicKey').value = savedPublicKey;
+            
+            // 當使用者輸入時保存到 localStorage
+            document.getElementById('serviceId').addEventListener('input', function(e) {
+                localStorage.setItem('emailjs_test_service_id', e.target.value);
+            });
+            
+            document.getElementById('templateId').addEventListener('input', function(e) {
+                localStorage.setItem('emailjs_test_template_id', e.target.value);
+            });
+            
+            document.getElementById('publicKey').addEventListener('input', function(e) {
+                localStorage.setItem('emailjs_test_public_key', e.target.value);
+            });
+        });
+    </script>
+</body>
+</html>
