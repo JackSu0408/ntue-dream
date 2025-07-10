@@ -24,40 +24,48 @@
             </div>
 
             <form class="register-form" id="registerForm">
+                <!-- 暫時註解個人資料欄位 -->
+                <!-- 
                 <div class="form-group">
-                    <label for="name">姓名</label>
+                    <label for="name">姓名 <span class="required">*</span></label>
                     <input type="text" id="name" name="name" placeholder="請輸入您的姓名" required />
                 </div>
+                -->
 
                 <div class="form-group">
-                    <label for="email">電子郵件</label>
+                    <label for="email">電子郵件 <span class="required">*</span></label>
                     <input type="email" id="email" name="email" placeholder="請輸入電子郵件地址" required />
                 </div>
 
                 <div class="form-group">
-                    <label for="password">密碼</label>
+                    <label for="password">密碼 <span class="required">*</span></label>
                     <div class="password-input">
                         <input type="password" id="password" name="password" placeholder="請輸入密碼（至少8位字元）" required minlength="8" />
                         <button type="button" class="toggle-password" onclick="togglePassword('password')">
                             <img src="img/eye.png" alt="顯示密碼" id="passwordEye" />
                         </button>
                     </div>
+                    <div class="input-message" id="passwordMessage" style="height:18px; display:none;"></div>
                 </div>
 
                 <div class="form-group">
-                    <label for="confirmPassword">確認密碼</label>
+                    <label for="confirmPassword">確認密碼 <span class="required">*</span></label>
                     <div class="password-input">
                         <input type="password" id="confirmPassword" name="confirmPassword" placeholder="請再次輸入密碼" required minlength="8" />
                         <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
                             <img src="img/eye.png" alt="顯示密碼" id="confirmPasswordEye" />
                         </button>
                     </div>
+                    <div class="input-message" id="confirmPasswordMessage" style="height:18px; display:none;"></div>
                 </div>
 
+                <!-- 暫時註解手機號碼欄位 -->
+                <!--
                 <div class="form-group">
-                    <label for="phone">手機號碼</label>
-                    <input type="tel" id="phone" name="phone" placeholder="請輸入手機號碼" required />
+                    <label for="phone">手機號碼 <span class="optional">(選填)</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="請輸入手機號碼" />
                 </div>
+                -->
 
                 <!-- 移除身份選擇和專用欄位 -->
                 <!-- 
@@ -216,22 +224,83 @@
         });
         */
 
-        // 密碼確認驗證
+        // 密碼確認驗證與即時提示
         function validatePassword() {
             const password = document.getElementById('password').value;
             const confirmPassword = document.getElementById('confirmPassword').value;
+            const passwordInput = document.getElementById('password');
             const confirmPasswordInput = document.getElementById('confirmPassword');
+            const passwordMessage = document.getElementById('passwordMessage');
+            const confirmPasswordMessage = document.getElementById('confirmPasswordMessage');
 
+            if (!password && !confirmPassword) {
+                passwordInput.classList.remove('input-error', 'input-success');
+                confirmPasswordInput.classList.remove('input-error', 'input-success');
+                passwordMessage.textContent = '';
+                passwordMessage.style.display = 'none'; // 隱藏
+                confirmPasswordMessage.textContent = '';
+                confirmPasswordMessage.style.display = 'none'; // 隱藏
+                return null;
+            }
+
+            // 檢查密碼長度
+            if (password.length > 0 && password.length < 8) {
+                passwordInput.classList.add('input-error');
+                passwordInput.classList.remove('input-success');
+                passwordMessage.textContent = '密碼至少需要8個字元';
+                passwordMessage.style.color = '#e74c3c';
+                passwordMessage.style.display = 'block'; // 顯示
+                
+                // 清除確認密碼的狀態
+                confirmPasswordInput.classList.remove('input-error', 'input-success');
+                confirmPasswordMessage.textContent = '';
+                confirmPasswordMessage.style.display = 'none'; // 隱藏
+                return false;
+            } else if (password.length >= 8) {
+                passwordInput.classList.remove('input-error');
+                passwordMessage.textContent = '';
+                passwordMessage.style.display = 'none'; // 隱藏
+            }
+
+            // 檢查密碼是否相符
             if (password !== confirmPassword) {
+                if (confirmPassword.length > 0) {
+                    confirmPasswordInput.classList.add('input-error');
+                    confirmPasswordInput.classList.remove('input-success');
+                    confirmPasswordMessage.textContent = '密碼不相符';
+                    confirmPasswordMessage.style.color = '#e74c3c';
+                    confirmPasswordMessage.style.display = 'block'; // 顯示
+                } else {
+                    confirmPasswordInput.classList.remove('input-error', 'input-success');
+                    confirmPasswordMessage.textContent = '';
+                    confirmPasswordMessage.style.display = 'none'; // 隱藏
+                }
                 confirmPasswordInput.setCustomValidity('密碼不相符');
                 return false;
-            } else {
+            } else if (password.length >= 8 && confirmPassword.length >= 8) {
+                passwordInput.classList.add('input-success');
+                passwordInput.classList.remove('input-error');
+                confirmPasswordInput.classList.add('input-success');
+                confirmPasswordInput.classList.remove('input-error');
+                passwordMessage.textContent = '';
+                passwordMessage.style.display = 'none'; // 隱藏
+                confirmPasswordMessage.textContent = '密碼正確';
+                confirmPasswordMessage.style.color = '#27ae60';
+                confirmPasswordMessage.style.display = 'block'; // 顯示
                 confirmPasswordInput.setCustomValidity('');
                 return true;
+            } else {
+                passwordInput.classList.remove('input-error', 'input-success');
+                confirmPasswordInput.classList.remove('input-error', 'input-success');
+                passwordMessage.textContent = '';
+                passwordMessage.style.display = 'none'; // 隱藏
+                confirmPasswordMessage.textContent = '';
+                confirmPasswordMessage.style.display = 'none'; // 隱藏
+                confirmPasswordInput.setCustomValidity('');
+                return null;
             }
         }
 
-        // 即時密碼驗證
         document.getElementById('confirmPassword').addEventListener('input', validatePassword);
         document.getElementById('password').addEventListener('input', validatePassword);
 
@@ -323,6 +392,49 @@
             }
         });
     </script>
+
+    <style>
+        /* 新增密碼驗證樣式 */
+        .input-error {
+            border: 2px solid #e74c3c !important;
+            background-color: #fff6f6 !important;
+        }
+        .input-success {
+            border: 2px solid #27ae60 !important;
+            background-color: #f6fff8 !important;
+        }
+        .input-message {
+            font-size: 0.9em;
+            margin-top: 2px;
+            min-height: 18px;
+            color: #e74c3c;
+            transition: color 0.2s;
+        }
+        .input-success ~ .input-message {
+            color: #27ae60;
+        }
+        
+        /* 必填和選填標示樣式 */
+        .required {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .optional {
+            color: #666;
+            font-size: 0.9em;
+            font-weight: normal;
+        }
+        
+        @media (max-width: 600px) {
+            .input-message {
+                font-size: 0.85em;
+                min-height: 16px;
+            }
+            .optional {
+                font-size: 0.85em;
+            }
+        }
+    </style>
 </body>
 
 </html>

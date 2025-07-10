@@ -568,7 +568,8 @@ class HeaderComponent extends HTMLElement {
             <div class="profile-icon" onclick="toggleUserDropdown()">
               <img src="img/user.png" alt="User" />
               <div class="user-dropdown" id="userDropdown">
-                <div class="dropdown-item" onclick="viewProfile()">個人資料</div>
+                <!-- 暫時移除個人資料選項 -->
+                <!--<div class="dropdown-item" onclick="viewProfile()">個人資料</div>-->
                 <div class="dropdown-item" onclick="viewMyProposals()">我的提案</div>
                 <div class="dropdown-item" onclick="logoutUser()">登出</div>
               </div>
@@ -629,7 +630,8 @@ class HeaderComponent extends HTMLElement {
           <!-- 用戶操作選單 -->
           <div class="mobile-user-actions">
             ${isLoggedIn ? `
-              <button class="mobile-action-btn" onclick="viewProfile()">個人資料</button>
+              <!-- 暫時移除個人資料選項 -->
+              <!--<button class="mobile-action-btn" onclick="viewProfile()">個人資料</button>-->
               <button class="mobile-action-btn" onclick="viewMyProposals()">我的提案</button>
               <button class="mobile-action-btn logout" onclick="logoutUser()">登出</button>
             ` : `
@@ -735,10 +737,10 @@ class HeaderComponent extends HTMLElement {
         };
 
         window.viewMyProposals = function() {
-            alert('我的提案功能開發中...');
             const userDropdown = document.getElementById('userDropdown');
             if (userDropdown) userDropdown.classList.remove('show');
             closeMobileMenu();
+            window.location.href = 'my-proposals.html';
         };
 
         window.logoutUser = function() {

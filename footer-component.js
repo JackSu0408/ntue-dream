@@ -359,7 +359,7 @@ footerTemplate.innerHTML = `
 			<div class="footer-right">
 				<h4>聯絡我們</h4>
 				<div><img src="img/location.png" alt="loc">台北市大安區和平東路二段134號</div>
-				<div><img src="img/email.png" alt="email">s11219039@stu.ntue.edu.tw</div>
+				<div><img src="img/email.png" alt="email">s111219039@stu.ntue.edu.tw</div>
 				<div><img src="img/phone.png" alt="phone">(02) 6639-6688</div>
 			</div>
 		</div>
