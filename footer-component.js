@@ -354,6 +354,8 @@ footerTemplate.innerHTML = `
 				<a href="proposal.html">夢想聚合</a>
 				<a href="overview.html">提案總覽</a>
 				<a href="questions.html">常見問題</a>
+				<a href="terms-of-service.html">服務條款</a>
+				<a href="privacy-policy.html">隱私政策</a>
 			</div>
 
 			<div class="footer-right">

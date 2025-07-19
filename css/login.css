@@ -235,6 +235,7 @@ main.login-wrapper {
   transform: rotate(45deg);
 }
 
+/* 註解掉忘記密碼樣式
 .forgot-password {
   font-size: 1vw;
   color: #333;
@@ -247,6 +248,7 @@ main.login-wrapper {
   text-decoration: underline;
   transform: translateY(-1px);
 }
+*/
 
 .login-btn,
 .register-btn {
@@ -425,9 +427,11 @@ main.login-wrapper {
     margin-right: 8px;
   }
 
+  /* 註解掉忘記密碼樣式
   .forgot-password {
     font-size: 16px;
   }
+  */
 
   .login-btn,
   .register-btn {
@@ -554,9 +558,11 @@ main.login-wrapper {
     margin-right: 1vw;
   }
 
+  /* 註解掉忘記密碼樣式
   .forgot-password {
     font-size: 1.8vw;
   }
+  */
 
   .login-btn,
   .register-btn {
@@ -702,6 +708,7 @@ main.login-wrapper {
     border-width: 2px;
   }
 
+  /* 註解掉忘記密碼樣式
   .forgot-password {
     font-size: 16px;
     align-self: flex-end;
@@ -710,6 +717,7 @@ main.login-wrapper {
     display: flex;
     align-items: center;
   }
+  */
 
   .login-btn,
   .register-btn {
@@ -813,10 +821,15 @@ main.login-wrapper {
     gap: 12px;
   }
 
-  .remember-me,
+  .remember-me {
+    font-size: 15px;
+  }
+
+  /* 註解掉忘記密碼樣式
   .forgot-password {
     font-size: 15px;
   }
+  */
 
   .checkmark {
     width: 16px;

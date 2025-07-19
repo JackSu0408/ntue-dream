@@ -186,8 +186,15 @@ main.register-wrapper {
 
 .form-options {
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   margin: 0.5vw 0;
+}
+
+.form-options .terms-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
 }
 
 /* 註冊頁面特有的條款同意樣式 */
@@ -306,6 +313,23 @@ input:invalid:focus {
   box-shadow: 0 0 0 2px rgba(255, 107, 107, 0.2);
 }
 
+/* 服務條款驗證樣式 */
+.terms-agree .checkmark.error {
+  border-color: #e74c3c;
+  background-color: #fff6f6;
+}
+
+.form-options .input-message {
+  font-size: 1vw;
+  margin-top: 0;
+  min-height: 18px;
+  color: #e74c3c;
+  transition: color 0.2s;
+  text-align: right;
+  flex-shrink: 0;
+  margin-left: 1vw;
+}
+
 /* 大螢幕版型 (1400px以上) */
 @media (min-width: 1400px) {
   main.register-wrapper {
@@ -387,6 +411,14 @@ input:invalid:focus {
 
   .form-options {
     margin: 8px 0;
+    flex-direction: column;
+  }
+
+  .form-options .terms-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
   }
 
   .terms-agree {
@@ -408,6 +440,15 @@ input:invalid:focus {
 
   .login-link {
     font-size: 14px;
+  }
+
+  /* 服務條款驗證樣式 - 大螢幕版型 */
+  .form-options .input-message {
+    font-size: 12px;
+    margin-top: 0;
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 15px;
   }
 }
 
@@ -492,6 +533,14 @@ input:invalid:focus {
 
   .form-options {
     margin: 1vw 0;
+    flex-direction: column;
+  }
+
+  .form-options .terms-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
   }
 
   .terms-agree {
@@ -514,6 +563,15 @@ input:invalid:focus {
 
   .login-link {
     font-size: 1.6vw;
+  }
+
+  /* 服務條款驗證樣式 - 平板版型 */
+  .form-options .input-message {
+    font-size: 1.8vw;
+    margin-top: 0;
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 1vw;
   }
 }
 
@@ -616,6 +674,14 @@ input:invalid:focus {
     align-items: flex-start;
   }
 
+  .form-options .terms-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 15px;
+  }
+
   .terms-agree {
     font-size: 16px;
     align-self: flex-start;
@@ -642,6 +708,15 @@ input:invalid:focus {
   .login-link {
     font-size: 14px;
     margin-top: 20px;
+  }
+
+  /* 服務條款驗證樣式 - 手機版型 */
+  .form-options .input-message {
+    font-size: 16px;
+    margin-top: 0;
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 10px;
   }
 }
 
@@ -720,6 +795,15 @@ input:invalid:focus {
   .form-options {
     gap: 12px;
     margin: 12px 0;
+    flex-direction: column;
+  }
+
+  .form-options .terms-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    width: 100%;
+    gap: 10px;
   }
 
   .terms-agree {
@@ -745,6 +829,15 @@ input:invalid:focus {
   .login-link {
     font-size: 13px;
     margin-top: 15px;
+  }
+
+  /* 服務條款驗證樣式 - 小手機版型 */
+  .form-options .input-message {
+    font-size: 15px;
+    margin-top: 0;
+    text-align: right;
+    flex-shrink: 0;
+    margin-left: 8px;
   }
 }
 
